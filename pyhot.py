@@ -56,3 +56,4 @@ class SLM(object):
 
         # round
         return np.ushort(np.around(holo))
+        # return holo
