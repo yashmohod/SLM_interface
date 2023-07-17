@@ -44,6 +44,8 @@ class SLM(object):
             return self._calc_holo_spl(pts)
         elif method == 'rs':
             return self._calc_holo_rs(pts)
+        elif method == 'rm':
+            return self._calc_holo_rm(pts)
         else:
             raise NotImplementedError
 
@@ -73,7 +75,7 @@ class SLM(object):
 
         return convert_and_scale(holo_sum)
 
-    def _calc_holo_rma(self, pts):
+    def _calc_holo_rm(self, pts):
         '''
         Calculate holograms using random mask encoding. For N trap points,
         a randomly-chosen subset of 1/N of the hologram points display
