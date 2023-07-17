@@ -31,6 +31,7 @@ class SLM(object):
         # 1D array of locations
         self.xs_r = self.xs.ravel()
         self.ys_r = self.ys.ravel()
+        self.npix = len(self.xs_r)
         self.holo_indices = np.arange(len(self.xs_r))
 
         if random_seed is None:
@@ -78,17 +79,17 @@ class SLM(object):
         a randomly-chosen subset of 1/N of the hologram points display
         the hologram associated with any given trap.
         '''
-        npts = len(self.xs_r)
-        holo = np.zeros(npts)
+        holo = np.zeros(self.npix, dtype = np.complex128)
         shuffled_indices = self.rng.permuted(self.holo_indices)
-        npts_over_M = np.floor(npts/len(pts)).astype('int')
+        npix_over_M = np.floor(self.npix/len(pts)).astype('int')
 
         for pt_index, point in zip(np.arange(len(pts)), pts):
-            lower_ind = pt_index * npts_over_M
-            upper_ind = (pt_index + 1) * npts_over_M
+            lower_ind = pt_index * npix_over_M
+            upper_ind = (pt_index + 1) * npix_over_M
             holo[shuffled_indices[lower_ind:upper_ind]] = \
-                _calc_single_pt_holo(point, xs[lower_ind:upper_ind],
-                                     ys[lower_ind:upper_ind])
+                np.exp(1j* self._calc_single_pt_holo(point,
+                                                     self.xs_r[shuffled_indices[lower_ind:upper_ind]],
+                                                     self.ys_r[shuffled_indices[lower_ind:upper_ind]]))
 
         return convert_and_scale(holo.reshape((self.nx, self.ny)))
 
