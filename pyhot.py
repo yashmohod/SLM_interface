@@ -52,14 +52,15 @@ class SLM(object):
     def _calc_phase_spl(self, pts):
         '''
         Calculate hologram using superposition of prisms and lenses.
+
         '''
 
         holo_sum = np.zeros((self.nx, self.ny), dtype = np.complex128)
 
         for pt in pts:
-            holo_sum += np.exp(1j * self._calc_single_pt_phase(pt))
+            holo_sum += np.exp(1j*self._calc_single_pt_phase(pt))
 
-        return convert_and_scale(holo_sum)
+        return np.angle(holo_sum) + np.pi
 
     def _calc_phase_rs(self, pts):
         '''
@@ -71,9 +72,9 @@ class SLM(object):
         random_phases = self.rng.random(len(pts)) * 2 * np.pi
 
         for pt, phase in zip(pts, random_phases):
-            holo_sum += np.exp(1j * (self._calc_single_pt_phase(pt) + phase))
+            holo_sum += np.exp(1j*(self._calc_single_pt_phase(pt) + phase))
 
-        return convert_and_scale(holo_sum)
+        return np.angle(holo_sum) + np.pi
 
     def _calc_phase_rm(self, pts):
         '''
@@ -81,7 +82,7 @@ class SLM(object):
         a randomly-chosen subset of 1/N of the hologram points display
         the hologram associated with any given trap.
         '''
-        holo = np.zeros(self.npix, dtype = np.complex128)
+        holo = np.zeros(self.npix)
         shuffled_indices = self.rng.permuted(self.holo_indices)
         npix_over_M = np.floor(self.npix/len(pts)).astype('int')
 
@@ -89,16 +90,17 @@ class SLM(object):
             lower_ind = pt_index * npix_over_M
             upper_ind = (pt_index + 1) * npix_over_M
             holo[shuffled_indices[lower_ind:upper_ind]] = \
-                np.exp(1j* self._calc_single_pt_phase(point,
-                                                     self.xs_r[shuffled_indices[lower_ind:upper_ind]],
-                                                     self.ys_r[shuffled_indices[lower_ind:upper_ind]]))
+                self._calc_single_pt_phase(point,
+                                           self.xs_r[shuffled_indices[lower_ind:upper_ind]],
+                                           self.ys_r[shuffled_indices[lower_ind:upper_ind]])
 
-        return convert_and_scale(holo.reshape((self.nx, self.ny)))
+        return holo.reshape((self.nx, self.ny)) % (2 * np.pi)
 
 
     def _calc_single_pt_phase(self, pt, xs = None, ys = None):
         '''
-        Grating-and-lens hologram to produce a single point trap.
+        Grating-and-lens phase for hologram to produce a single point trap.
+        See di Leonardo, Ianni, Ruocco eqn (2).
         '''
         if xs is None:
             xs = self.xs
@@ -111,10 +113,18 @@ class SLM(object):
             xs * pt[0] + ys * pt[1])
         return Delta_m_lens + Delta_m_grating
 
+    def trap_field(self, point, phase_pattern):
+        '''Calculate nondimensional trap field V_m for a trap located
+           at point given hologram phase_pattern.
+           See Eq. (3) of di Leonardo, Ianni, and Ruocco (2007)
+        '''
+        pt_phase = self._calc_single_pt_phase(point)
+        return np.exp(1j*(phase_pattern - pt_phase)).sum() / self.npix
+
 
 def convert_and_scale(raw_holo):
     # np.angle between -pi and pi, shift to 0 to 2 pi
-    holo = np.angle(raw_holo) + np.pi
+    holo = raw_holo + np.pi
     # scale to 8 bit
     holo = holo * 255 / (2 * np.pi)
     # round

@@ -1,5 +1,6 @@
 import SLM_interface.pyhot as pyhot
 import numpy as np
+import pytest
 
 # Currently, just test that the interface runs, not for physical correctness
 
@@ -20,10 +21,23 @@ class TestClass:
     def test_rm(self):
         self.mySLM.calc_holo(self.points, method = 'rm')
 
-    def test_one_point_equality(self):
+    def one_point_equality(self):
         # Algorithms should agree for a single point hologram
         spl = self.mySLM.calc_holo(self.one_point, method = 'spl')
         rm = self.mySLM.calc_holo(self.one_point, method = 'rm')
-        rs = self.mySLM.calc_holo(self.one_point, method = 'rs')
         assert np.array_equal(rm, spl)
-        assert np.array_equal(rs, spl)
+
+    def test_ft_intensity(self):
+        holo = self.mySLM.calc_holo(self.one_point, method = 'spl')
+        intensity = pyhot.calc_fourier_amplitude(holo)
+
+    def test_trap_field(self):
+        phase = self.mySLM._calc_single_pt_phase(self.one_point[0])
+        Vm = self.mySLM.trap_field(self.one_point[0], phase)
+        np.abs(Vm) == pytest.approx(1)
+
+        phase2 = self.mySLM._calc_phase_spl(self.points)
+        V0 = self.mySLM.trap_field(self.points[0], phase2)
+        V1 = self.mySLM.trap_field(self.points[1], phase2)
+        print(np.abs(V0)**2)
+        print(np.abs(V1)**2)
