@@ -46,6 +46,8 @@ class SLM(object):
             return convert_and_scale(self._calc_phase_rs(pts))
         elif method == 'rm':
             return convert_and_scale(self._calc_phase_rm(pts))
+        elif method == 'wgs':
+            return convert_and_scale(self._calc_phase_wgs(pts))
         else:
             raise NotImplementedError
 
@@ -112,6 +114,49 @@ class SLM(object):
         Delta_m_grating = 2 * np.pi / (self.wavelen * self.f) * (
             xs * pt[0] + ys * pt[1])
         return Delta_m_lens + Delta_m_grating
+
+
+    def _calc_phase_wgs(self, pts, max_eps = 1e-3, max_iter = 30):
+        '''Calculate hologram using weighted Gerchberg-Saxton algorithm,
+        as in di Leonardo et al.
+        '''
+        n_traps = len(pts)
+
+        # initialize
+        weights = np.ones(n_traps)
+        phase = self._calc_phase_rs(pts)
+        prev_phase = np.ones((self.nx, self.ny))
+
+        iter_cnt = 0
+        for n_iter in np.arange(max_iter):
+            # calculate trap fields
+            fields = np.array([self.trap_field(pt, phase) for pt in pts])
+            av_field = np.average(np.abs(fields))
+            # update weights
+            weights = weights * av_field / np.abs(fields)
+
+            # update phase
+            phase_sum = np.zeros((self.nx, self.ny), dtype = np.complex128)
+
+            for pt, ctr in zip(pts, np.arange(n_traps)):
+                phase_sum += np.exp(1j*self._calc_single_pt_phase(pt)) * \
+                    weights[ctr] * fields[ctr] / np.abs(fields[ctr])
+
+            # test for convergence
+            new_phase = np.angle(phase_sum) + np.pi
+            eps = np.abs((new_phase - phase)/phase)
+            prev_eps = np.abs((new_phase - prev_phase)/prev_phase)
+            if (eps < max_eps).all() or (prev_eps < max_eps).all(): # converged
+                phase = new_phase
+                break
+            else:
+                prev_phase = phase
+                phase = new_phase
+                iter_cnt += 1
+
+        print(iter_cnt)
+        return phase
+
 
     def trap_field(self, point, phase_pattern):
         '''Calculate nondimensional trap field V_m for a trap located
