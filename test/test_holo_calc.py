@@ -21,6 +21,9 @@ class TestClass:
     def test_rm(self):
         self.mySLM.calc_holo(self.points, method = 'rm')
 
+    def test_wgs(self):
+        self.mySLM.calc_holo(self.points, method = 'wgs')
+
     def one_point_equality(self):
         # Algorithms should agree for a single point hologram
         spl = self.mySLM.calc_holo(self.one_point, method = 'spl')
@@ -36,7 +39,7 @@ class TestClass:
         Vm = self.mySLM.trap_field(self.one_point[0], phase)
         np.abs(Vm) == pytest.approx(1)
 
-        phase2 = self.mySLM._calc_phase_spl(self.points)
+        phase2 = self.mySLM._calc_phase_wgs(self.points)
         V0 = self.mySLM.trap_field(self.points[0], phase2)
         V1 = self.mySLM.trap_field(self.points[1], phase2)
         print(np.abs(V0)**2)

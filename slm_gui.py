@@ -3,6 +3,8 @@ from screeninfo import get_monitors
 import numpy as np
 from PIL import Image as im
 import pyhot
+import os
+import glob
 
 class MainApp(wx.App):
     def __init__(self):
@@ -33,6 +35,7 @@ class appFrame(wx.Frame):
         self.OnInit()
 
     def OnInit(self):
+        self.UpdateFlag = False
         guiPanel = appPanel(parent=self)
 
 class appPanel(wx.Panel):
@@ -91,8 +94,21 @@ class appPanel(wx.Panel):
         updateDisplay = wx.Button(self,id = wx.ID_ANY, size= (200,40),pos = (500,500),label= "Update Display")
         updateDisplay.Bind(wx.EVT_BUTTON,self.updateDisplay)
 
+        # timer for updating
+        self.timer = wx.Timer(self)
+        self.Bind(wx.EVT_TIMER, self.OnTimer)
+        self.timer.Start(1000) # is this 1 second? (1000 ms)
+
+        self.ImgSeqNum = 0 # Flag to point to different
+
 
     def updateDisplay(self,event):
+        '''
+        Currently, calculates hologram for n points and updates the display.
+
+        New strategy: just calculate a series of images.
+        '''
+        self.UpdateFlag = True
         pts = self.points.GetValue()
         pts = pts.split("\n")
         ptsarr=[]
@@ -104,12 +120,21 @@ class appPanel(wx.Panel):
 
         print(float(self.pxVal.GetValue()), float(self.WaveLenVal.GetValue()), float(self.flocalLenVal.GetValue()))
         mySLMengine = pyhot.SLM(self.geo[3],self.geo[2],float(self.pxVal.GetValue()), float(self.WaveLenVal.GetValue()), float(self.flocalLenVal.GetValue()))
-        self.curDisplayPic = mySLMengine.calc_holo(ptsarr)
-        data = im.fromarray(mySLMengine.calc_holo(ptsarr)).convert('RGB')
-        data.save('temp.png')
-        png = wx.Image('temp.png', wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-        self.holo.updateIMG(png)
-        self.curdis.SetBitmap(scale_bitmap(png,0.4))
+
+        for pt, ctr in zip(pts, np.arange(len(pts))):
+            holo = mySLMengine.calc_holo(np.array([pt])) # single point hologram
+            data = im.fromarray(holo).convert('RGB')
+            fname = 'temp' + str(ctr).zfill(2) + '.png'
+            data.save(fname)
+
+        self.ImageSeqNum = 0
+
+        #self.curDisplayPic = mySLMengine.calc_holo(ptsarr) # a ndarray
+        #data = im.fromarray(mySLMengine.calc_holo(ptsarr)).convert('RGB')
+        #data.save('temp.png')
+        #png = wx.Image('temp.png', wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+        #self.holo.updateIMG(png)
+        #self.curdis.SetBitmap(scale_bitmap(png,0.4))
 
 
 
@@ -126,6 +151,25 @@ class appPanel(wx.Panel):
         img = wx.ImageFromBuffer(width=w, height=h, dataBuffer=data)
         # png = img.ConvertToBitmap()
         return wx.Bitmap(img)
+
+
+    def OnTimer(self):
+        if self.UpdateFlag is True:
+            # list all files named tempXX.png
+            png_list = glob.glob('temp[0123456789][0123456789].png').sort()
+            n_imgs = len(png_list)
+
+            # update displays
+            fname = 'temp' + str(self.ImageSeqNum).zfill(2) + '.png'
+            png = wx.Image(fname, wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+            self.holo.updateIMG(png)
+            self.curdis.SetBitmap(scale_bitmap(png,0.4))
+
+            # update pointer
+            if self.ImageSeqNum == (n_images - 1): # cycle back
+                self.ImageSeqNum = 0
+            else:
+                self.ImageSeqNum += 1
 
 
 class hologram(wx.Frame):
