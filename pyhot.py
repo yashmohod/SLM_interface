@@ -124,7 +124,7 @@ class SLM(object):
 
 def convert_and_scale(raw_holo):
     # np.angle between -pi and pi, shift to 0 to 2 pi
-    holo = raw_holo + np.pi
+    holo = raw_holo
     # scale to 8 bit
     holo = holo * 255 / (2 * np.pi)
     # round
