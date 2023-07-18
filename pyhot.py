@@ -41,15 +41,15 @@ class SLM(object):
 
     def calc_holo(self, pts, method = 'spl'):
         if method == 'spl':
-            return self._calc_holo_spl(pts)
+            return convert_and_scale(self._calc_phase_spl(pts))
         elif method == 'rs':
-            return self._calc_holo_rs(pts)
+            return convert_and_scale(self._calc_phase_rs(pts))
         elif method == 'rm':
-            return self._calc_holo_rm(pts)
+            return convert_and_scale(self._calc_phase_rm(pts))
         else:
             raise NotImplementedError
 
-    def _calc_holo_spl(self, pts):
+    def _calc_phase_spl(self, pts):
         '''
         Calculate hologram using superposition of prisms and lenses.
         '''
@@ -57,11 +57,11 @@ class SLM(object):
         holo_sum = np.zeros((self.nx, self.ny), dtype = np.complex128)
 
         for pt in pts:
-            holo_sum += np.exp(1j * self._calc_single_pt_holo(pt))
+            holo_sum += np.exp(1j * self._calc_single_pt_phase(pt))
 
         return convert_and_scale(holo_sum)
 
-    def _calc_holo_rs(self, pts):
+    def _calc_phase_rs(self, pts):
         '''
         Calculate hologram using random superposition, adding a randomly-chosen
         phase factor to the hologram associated with each point trap.
@@ -71,11 +71,11 @@ class SLM(object):
         random_phases = self.rng.random(len(pts)) * 2 * np.pi
 
         for pt, phase in zip(pts, random_phases):
-            holo_sum += np.exp(1j * (self._calc_single_pt_holo(pt) + phase))
+            holo_sum += np.exp(1j * (self._calc_single_pt_phase(pt) + phase))
 
         return convert_and_scale(holo_sum)
 
-    def _calc_holo_rm(self, pts):
+    def _calc_phase_rm(self, pts):
         '''
         Calculate holograms using random mask encoding. For N trap points,
         a randomly-chosen subset of 1/N of the hologram points display
@@ -89,14 +89,14 @@ class SLM(object):
             lower_ind = pt_index * npix_over_M
             upper_ind = (pt_index + 1) * npix_over_M
             holo[shuffled_indices[lower_ind:upper_ind]] = \
-                np.exp(1j* self._calc_single_pt_holo(point,
+                np.exp(1j* self._calc_single_pt_phase(point,
                                                      self.xs_r[shuffled_indices[lower_ind:upper_ind]],
                                                      self.ys_r[shuffled_indices[lower_ind:upper_ind]]))
 
         return convert_and_scale(holo.reshape((self.nx, self.ny)))
 
 
-    def _calc_single_pt_holo(self, pt, xs = None, ys = None):
+    def _calc_single_pt_phase(self, pt, xs = None, ys = None):
         '''
         Grating-and-lens hologram to produce a single point trap.
         '''
