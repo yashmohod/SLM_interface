@@ -35,7 +35,6 @@ class appFrame(wx.Frame):
         self.OnInit()
 
     def OnInit(self):
-        self.UpdateFlag = False
         guiPanel = appPanel(parent=self)
 
 class appPanel(wx.Panel):
@@ -95,6 +94,7 @@ class appPanel(wx.Panel):
         updateDisplay.Bind(wx.EVT_BUTTON,self.updateDisplay)
 
         # timer for updating
+        self.UpdateFlag = False
         self.timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.OnTimer)
         self.timer.Start(1000) # is this 1 second? (1000 ms)
