@@ -121,7 +121,8 @@ class appPanel(wx.Panel):
         print(float(self.pxVal.GetValue()), float(self.WaveLenVal.GetValue()), float(self.flocalLenVal.GetValue()))
         mySLMengine = pyhot.SLM(self.geo[3],self.geo[2],float(self.pxVal.GetValue()), float(self.WaveLenVal.GetValue()), float(self.flocalLenVal.GetValue()))
 
-        for pt, ctr in zip(pts, np.arange(len(pts))):
+        for pt, ctr in zip(ptsarr, np.arange(len(pts))):
+            print(np.array)
             holo = mySLMengine.calc_holo(np.array([pt])) # single point hologram
             data = im.fromarray(holo).convert('RGB')
             fname = 'temp' + str(ctr).zfill(2) + '.png'
@@ -153,7 +154,7 @@ class appPanel(wx.Panel):
         return wx.Bitmap(img)
 
 
-    def OnTimer(self):
+    def OnTimer(self, event):
         if self.UpdateFlag is True:
             # list all files named tempXX.png
             png_list = glob.glob('temp[0123456789][0123456789].png').sort()
