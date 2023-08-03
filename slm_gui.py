@@ -157,7 +157,8 @@ class appPanel(wx.Panel):
         if self.UpdateFlag is True:
             # list all files named tempXX.png
             png_list = glob.glob('temp[0123456789][0123456789].png')
-            print(png_list)
+            png_list.sort()
+            #print(png_list)
             n_imgs = len(png_list)
 
             # update displays
@@ -167,7 +168,7 @@ class appPanel(wx.Panel):
             self.curdis.SetBitmap(scale_bitmap(png,0.4))
 
             # update pointer
-            if self.ImageSeqNum == (n_images - 1): # cycle back
+            if self.ImageSeqNum == (n_imgs - 1): # cycle back
                 self.ImageSeqNum = 0
             else:
                 self.ImageSeqNum += 1
