@@ -108,7 +108,6 @@ class appPanel(wx.Panel):
 
         New strategy: just calculate a series of images.
         '''
-        self.UpdateFlag = True
         pts = self.points.GetValue()
         pts = pts.split("\n")
         ptsarr=[]
@@ -128,6 +127,7 @@ class appPanel(wx.Panel):
             data.save(fname)
 
         self.ImageSeqNum = 0
+        self.UpdateFlag = True
 
         #self.curDisplayPic = mySLMengine.calc_holo(ptsarr) # a ndarray
         #data = im.fromarray(mySLMengine.calc_holo(ptsarr)).convert('RGB')
