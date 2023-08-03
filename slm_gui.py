@@ -156,7 +156,8 @@ class appPanel(wx.Panel):
     def OnTimer(self, event):
         if self.UpdateFlag is True:
             # list all files named tempXX.png
-            png_list = glob.glob('temp[0123456789][0123456789].png').sort()
+            png_list = glob.glob('temp[0123456789][0123456789].png')
+            print(png_list)
             n_imgs = len(png_list)
 
             # update displays
