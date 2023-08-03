@@ -94,11 +94,12 @@ class appPanel(wx.Panel):
         updateDisplay.Bind(wx.EVT_BUTTON,self.updateDisplay)
 
         # timer for updating
+        self.update_time_ms = 100
         self.UpdateFlag = False
         self.ChangedFlag = False
         self.timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.OnTimer)
-        self.timer.Start(500) # is this 1 second? (1000 ms)
+        self.timer.Start(self.update_time_ms) 
 
         self.ImgSeqNum = 0 # Flag to point to different
 
