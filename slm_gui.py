@@ -122,7 +122,6 @@ class appPanel(wx.Panel):
         mySLMengine = pyhot.SLM(self.geo[3],self.geo[2],float(self.pxVal.GetValue()), float(self.WaveLenVal.GetValue()), float(self.flocalLenVal.GetValue()))
 
         for pt, ctr in zip(ptsarr, np.arange(len(pts))):
-            print(np.array)
             holo = mySLMengine.calc_holo(np.array([pt])) # single point hologram
             data = im.fromarray(holo).convert('RGB')
             fname = 'temp' + str(ctr).zfill(2) + '.png'
