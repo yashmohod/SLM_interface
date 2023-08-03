@@ -95,6 +95,7 @@ class appPanel(wx.Panel):
 
         # timer for updating
         self.UpdateFlag = False
+        self.ChangedFlag = False
         self.timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.OnTimer)
         self.timer.Start(100) # is this 1 second? (1000 ms)
@@ -128,6 +129,7 @@ class appPanel(wx.Panel):
 
         self.ImageSeqNum = 0
         self.UpdateFlag = True
+        self.ChangedFlag = True
 
         #self.curDisplayPic = mySLMengine.calc_holo(ptsarr) # a ndarray
         #data = im.fromarray(mySLMengine.calc_holo(ptsarr)).convert('RGB')
@@ -161,18 +163,22 @@ class appPanel(wx.Panel):
             #print(png_list)
             n_imgs = len(png_list)
 
-            # update displays
-            fname = 'temp' + str(self.ImageSeqNum).zfill(2) + '.png'
-            png = wx.Image(fname, wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-            self.holo.updateIMG(png)
-            self.curdis.SetBitmap(scale_bitmap(png,0.4))
-
-            # update pointer
-            if self.ImageSeqNum == (n_imgs - 1): # cycle back
-                self.ImageSeqNum = 0
+            if (n_imgs == 1) and (self.ChangedFlag is False):
+                return
             else:
-                self.ImageSeqNum += 1
+                # update displays
+                fname = 'temp' + str(self.ImageSeqNum).zfill(2) + '.png'
+                png = wx.Image(fname, wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+                self.holo.updateIMG(png)
+                self.curdis.SetBitmap(scale_bitmap(png,0.4))
 
+                # update pointer
+                if self.ImageSeqNum == (n_imgs - 1): # cycle back
+                    self.ImageSeqNum = 0
+                else:
+                    self.ImageSeqNum += 1
+
+                self.ChangedFlag = False
 
 class hologram(wx.Frame):
     def __init__(self,parent, pos,size,img):
