@@ -93,11 +93,6 @@ class appPanel(wx.Panel):
         updateDisplay = wx.Button(self,id = wx.ID_ANY, size= (200,40),pos = (500,500),label= "Update Display")
         updateDisplay.Bind(wx.EVT_BUTTON,self.updateDisplay)
 
-        # delete previous tempXX.png files
-        png_list = glob.glob('temp[0123456789][0123456789].png')
-        for fname in png_list:
-            os.remove(fname)
-
         # timer for updating
         self.UpdateFlag = False
         self.ChangedFlag = False
@@ -114,6 +109,11 @@ class appPanel(wx.Panel):
 
         New strategy: just calculate a series of images.
         '''
+        # delete previous tempXX.png files
+        png_list = glob.glob('temp[0123456789][0123456789].png')
+        for fname in png_list:
+            os.remove(fname)
+
         pts = self.points.GetValue()
         pts = pts.split("\n")
         ptsarr=[]
