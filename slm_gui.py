@@ -1,6 +1,6 @@
-import wx 
+import wx
 from screeninfo import get_monitors
-import numpy as np 
+import numpy as np
 from PIL import Image as im
 import pyhot
 
@@ -19,9 +19,9 @@ class MainApp(wx.App):
         self.Y = round(self.cur_display_geometry[3]/2 - self.cur_display_geometry[3]*(self.scree_size+0.1)/2)
         self.Xsize = round(self.cur_display_geometry[2]*self.scree_size)
         self.Ysize = round(self.cur_display_geometry[3]*(self.scree_size+0.1))
-        gui = appFrame(parent=None, 
-                       title="SLM", 
-                       pos=(self.X,self.Y), 
+        gui = appFrame(parent=None,
+                       title="SLM",
+                       pos=(self.X,self.Y),
                        size=(self.Xsize,self.Ysize),
                        )
         gui.Show()
@@ -60,7 +60,7 @@ class appPanel(wx.Panel):
 
         self.pxL = wx.StaticText(self, label="px", pos=(20,500))
         self.pxVal = wx.TextCtrl(self, value="", pos=(110,500), size=(100,-1))
-        self.flocalLenL = wx.StaticText(self, label="Flocal Length", pos=(20,530))
+        self.flocalLenL = wx.StaticText(self, label="Focal Length", pos=(20,530))
         self.flocalLenVal = wx.TextCtrl(self, value="", pos=(110,530), size=(100,-1))
         self.WaveLenL = wx.StaticText(self, label="Wave Length", pos=(20,560))
         self.WaveLenVal = wx.TextCtrl(self, value="", pos=(110,560), size=(100,-1))
@@ -72,7 +72,7 @@ class appPanel(wx.Panel):
 
         self.pointL = wx.StaticText(self, label="Points", pos=(250,500))
         # self.pointsList = wx.ListBox(self,size = (200,200),pos =(250,525) ,style = wx.LB_SINGLE)
-        self.points = wx.TextCtrl(self,size = (200,250),pos =(250,525),style = wx.TE_MULTILINE) 
+        self.points = wx.TextCtrl(self,size = (200,250),pos =(250,525),style = wx.TE_MULTILINE)
 
         # addPoints = wx.Button(self,id = wx.ID_ANY, size= (100,40), pos =(250,730),label= "Add Points")
         # clearPoints = wx.Button(self,id = wx.ID_ANY, size= (100,40), pos =(350,730),label= "Cleas Points")
@@ -82,7 +82,7 @@ class appPanel(wx.Panel):
         # display status
         # png = img.ConvertToBitmap()
         png =self.arrTObitmap(self.curDisplayPic)
- 
+
         # png = wx.Image("./test.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         # curdis = wx.StaticBitmap(self, id = wx.ID_ANY, bitmap = scale_bitmap(png,700,500), size= (-1,200))
         self.curdis = wx.StaticBitmap(self, id = wx.ID_ANY, bitmap = scale_bitmap(png,0.4), pos = (225,0))
@@ -110,9 +110,9 @@ class appPanel(wx.Panel):
         png = wx.Image('temp.png', wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         self.holo.updateIMG(png)
         self.curdis.SetBitmap(scale_bitmap(png,0.4))
-        
 
-    
+
+
     def arrTObitmap(self,array):
         h,w = array.shape[0], array.shape[1]
         print(len(array.shape))
@@ -121,12 +121,12 @@ class appPanel(wx.Panel):
             bw_array.shape = h, w, 1
             color_array = np.concatenate((bw_array,bw_array,bw_array), axis=2)
             data = color_array.tobytes()
-        else :      
-            data = array.tobytes()   
+        else :
+            data = array.tobytes()
         img = wx.ImageFromBuffer(width=w, height=h, dataBuffer=data)
         # png = img.ConvertToBitmap()
         return wx.Bitmap(img)
-        
+
 
 class hologram(wx.Frame):
     def __init__(self,parent, pos,size,img):
@@ -136,7 +136,7 @@ class hologram(wx.Frame):
     def updateIMG(self,img):
         self.curdis.SetBitmap(img)
 
-        
+
 
 
 # class hologram():
@@ -146,10 +146,10 @@ class hologram(wx.Frame):
 #         self.waveLen = waveLen
 #         self.focalLen = focalLen
 #         self.points = []
-    
+
 #     def getId(self):
 #         return self.id
-    
+
 #     def getPoints(self):
 #         return self.points
 
@@ -158,7 +158,7 @@ class hologram(wx.Frame):
 
 #     def addPoint(self,point):
 #         self.points.append(point)
-    
+
 #     def calImg(self,height,width):
 #         mySLMengine = pyhot.SLM(height,width,self.px, self.waveLen, self.focalLen)
 #         img_result = mySLMengine.calc_holo(self.points)
