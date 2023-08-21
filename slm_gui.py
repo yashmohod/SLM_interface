@@ -4,6 +4,9 @@ import numpy as np
 from PIL import Image as im
 import pyhot
 
+DISPLAY_1 = 0
+DISPLAY_2 = 0
+
 class MainApp(wx.App):
     def __init__(self):
         super().__init__(clearSigInt = True)
@@ -12,7 +15,7 @@ class MainApp(wx.App):
         self.InitAppFrame()
 
     def InitAppFrame(self):
-        self.main_display = wx.Display(1)
+        self.main_display = wx.Display(DISPLAY_1)
         self.cur_display_geometry = self.main_display.GetGeometry()
         self.scree_size = 0.7
         self.X = round(self.cur_display_geometry[2]/2 - self.cur_display_geometry[2]*self.scree_size/2)
@@ -43,11 +46,11 @@ class appPanel(wx.Panel):
 
     def OnInit(self):
         self.monitor_count = wx.Display.GetCount()
-        self.curDisplay = 1
+        self.curDisplay = DISPLAY_1
         self.secondDisplayGeo = wx.Display(self.curDisplay).GetGeometry()
         self.height = self.secondDisplayGeo[3]
         self.width = self.secondDisplayGeo[2]
-        dis2 = wx.Display(0)
+        dis2 = wx.Display(DISPLAY_2)
         self.geo= dis2.GetGeometry()
         self.curDisplayPic = np.zeros((self.geo[3],self.geo[2],3),dtype=np.uint8)
         self.holo = hologram(self,
@@ -91,8 +94,15 @@ class appPanel(wx.Panel):
         updateDisplay = wx.Button(self,id = wx.ID_ANY, size= (200,40),pos = (500,500),label= "Update Display")
         updateDisplay.Bind(wx.EVT_BUTTON,self.updateDisplay)
 
+        # print(dir(pyhot.SLM))
+        self.algos = ["rm","rs","spl","wgs"]
+        self.algoSelect = wx.ComboBox(self,choices = self.algos, size= (200,40),pos = (500,550) )
+
+        # wx.MessageBox('Your error message', 'Your error title', wx.OK | wx.ICON_ERROR)
+
 
     def updateDisplay(self,event):
+
         pts = self.points.GetValue()
         pts = pts.split("\n")
         ptsarr=[]
@@ -102,10 +112,12 @@ class appPanel(wx.Panel):
                     pt = str(pt).replace("(","").replace(")","").split(",")
                     ptsarr.append([float(pt[0]),float(pt[1]),float(pt[2])])
 
-        print(float(self.pxVal.GetValue()), float(self.WaveLenVal.GetValue()), float(self.flocalLenVal.GetValue()))
-        mySLMengine = pyhot_backup.SLM(self.geo[3],self.geo[2],float(self.pxVal.GetValue()), float(self.WaveLenVal.GetValue()), float(self.flocalLenVal.GetValue()))
-        self.curDisplayPic = mySLMengine.calc_holo(ptsarr)
-        data = im.fromarray(mySLMengine.calc_holo(ptsarr)).convert('RGB')
+        # print(float(self.pxVal.GetValue()), float(self.WaveLenVal.GetValue()), float(self.flocalLenVal.GetValue()))
+        mySLMengine = pyhot.SLM(self.geo[3],self.geo[2],float(self.pxVal.GetValue()), float(self.WaveLenVal.GetValue()), float(self.flocalLenVal.GetValue()))
+
+        self.curDisplayPic = mySLMengine.calc_holo(ptsarr,self.algos[self.algoSelect.GetSelection()])
+        data = im.fromarray(mySLMengine.calc_holo(ptsarr,self.algos[self.algoSelect.GetSelection()])).convert('RGB')
+
         data.save('temp.png')
         png = wx.Image('temp.png', wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         self.holo.updateIMG(png)
@@ -115,7 +127,7 @@ class appPanel(wx.Panel):
 
     def arrTObitmap(self,array):
         h,w = array.shape[0], array.shape[1]
-        print(len(array.shape))
+        # print(len(array.shape))
         if len(array.shape) == 2:
             bw_array = array.copy()
             bw_array.shape = h, w, 1

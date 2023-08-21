@@ -53,7 +53,7 @@ class appPanel(wx.Panel):
         # hologams 
         holoGramBox = wx.BoxSizer(wx.VERTICAL)
 
-        # languages = ['C', 'C++', 'Java', 'Python', 'Perl', 'JavaScript', 'PHP', 'VB.NET','C#']   
+        
         self.hologramList = wx.ListBox(self,size = (200,300), style = wx.LB_SINGLE)
         self.hologramList.Bind(wx.EVT_LISTBOX, self.selectHologram)
         holoGramBox.Add(self.hologramList,0,wx.ALIGN_CENTER_HORIZONTAL)
@@ -207,7 +207,7 @@ class hologram():
         self.points.append(point)
     
     def calImg(self,height,width):
-        mySLMengine = pyhot_backup.SLM(height,width,self.px, self.waveLen, self.focalLen)
+        mySLMengine = pyhot.SLM(height,width,self.px, self.waveLen, self.focalLen)
         img_result = mySLMengine.calc_holo(self.points)
         return img_result
 
