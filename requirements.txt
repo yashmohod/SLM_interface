@@ -1,0 +1,6 @@
+numpy==1.25.2
+Pillow==10.0.0
+screeninfo==0.8.1
+six==1.16.0
+wget==3.2
+wxPython==4.2.1
