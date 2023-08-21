@@ -207,7 +207,7 @@ class hologram():
         self.points.append(point)
     
     def calImg(self,height,width):
-        mySLMengine = pyhot.SLM(height,width,self.px, self.waveLen, self.focalLen)
+        mySLMengine = pyhot_backup.SLM(height,width,self.px, self.waveLen, self.focalLen)
         img_result = mySLMengine.calc_holo(self.points)
         return img_result
 

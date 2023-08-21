@@ -103,7 +103,7 @@ class appPanel(wx.Panel):
                     ptsarr.append([float(pt[0]),float(pt[1]),float(pt[2])])
 
         print(float(self.pxVal.GetValue()), float(self.WaveLenVal.GetValue()), float(self.flocalLenVal.GetValue()))
-        mySLMengine = pyhot.SLM(self.geo[3],self.geo[2],float(self.pxVal.GetValue()), float(self.WaveLenVal.GetValue()), float(self.flocalLenVal.GetValue()))
+        mySLMengine = pyhot_backup.SLM(self.geo[3],self.geo[2],float(self.pxVal.GetValue()), float(self.WaveLenVal.GetValue()), float(self.flocalLenVal.GetValue()))
         self.curDisplayPic = mySLMengine.calc_holo(ptsarr)
         data = im.fromarray(mySLMengine.calc_holo(ptsarr)).convert('RGB')
         data.save('temp.png')
