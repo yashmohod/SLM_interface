@@ -67,6 +67,10 @@ class appPanel(wx.Panel):
         self.WaveLenL = wx.StaticText(self, label="Wave Length", pos=(20,560))
         self.WaveLenVal = wx.TextCtrl(self, value="", pos=(110,560), size=(100,-1))
 
+        self.multitrap_rb = wx.RadioBox(self, label = 'Multiple trap method',
+                                        pos = (20, 690),
+                                        choices = ['Simultaneous', 'Time-shared'])
+
 
 
 
@@ -94,7 +98,7 @@ class appPanel(wx.Panel):
         updateDisplay.Bind(wx.EVT_BUTTON,self.updateDisplay)
 
         # timer for updating
-        self.update_time_ms = 100
+        self.update_time_ms = 50
         self.UpdateFlag = False
         self.ChangedFlag = False
         self.timer = wx.Timer(self)
