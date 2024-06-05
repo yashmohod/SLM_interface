@@ -68,8 +68,12 @@ class appPanel(wx.Panel):
         self.WaveLenVal = wx.TextCtrl(self, value="", pos=(110,560), size=(100,-1))
 
         self.multitrap_rb = wx.RadioBox(self, label = 'Multiple trap method',
-                                        pos = (20, 690),
+                                        pos = (20, 600),
                                         choices = ['Simultaneous', 'Time-shared'])
+        self.update_timeL = wx.StaticText(self, label = 'Time share period [ms]',
+                                          pos = (20, 630))
+        self.update_timeVal = wx.TextCtrl(self, value = '50', pos = (110, 630),
+                                          size = (100, -1))
 
 
 
@@ -98,7 +102,7 @@ class appPanel(wx.Panel):
         updateDisplay.Bind(wx.EVT_BUTTON,self.updateDisplay)
 
         # timer for updating
-        self.update_time_ms = 50
+        self.update_time_ms = int(self.update_timeL.GetValue())
         self.UpdateFlag = False
         self.ChangedFlag = False
         self.timer = wx.Timer(self)
@@ -110,14 +114,10 @@ class appPanel(wx.Panel):
 
     def updateDisplay(self,event):
         '''
-        Currently, calculates hologram for n points and updates the display.
-
-        New strategy: just calculate a series of images.
+        Calculates hologram for n points and updates the display, or
+        calculates a series of single-point holograms and loops through
+        displaying them.
         '''
-        # delete previous tempXX.png files
-        png_list = glob.glob('temp[0123456789][0123456789].png')
-        for fname in png_list:
-            os.remove(fname)
 
         pts = self.points.GetValue()
         pts = pts.split("\n")
@@ -131,23 +131,29 @@ class appPanel(wx.Panel):
         print(float(self.pxVal.GetValue()), float(self.WaveLenVal.GetValue()), float(self.flocalLenVal.GetValue()))
         mySLMengine = pyhot.SLM(self.geo[3],self.geo[2],float(self.pxVal.GetValue()), float(self.WaveLenVal.GetValue()), float(self.flocalLenVal.GetValue()))
 
-        for pt, ctr in zip(ptsarr, np.arange(len(pts))):
-            holo = mySLMengine.calc_holo(np.array([pt])) # single point hologram
+        if self.multitrap_rb.GetSelection() == 0: # Simultaneous display
+            holo = mySLMengine.calc_holo(ptsarr)
+            self.curDisplayPic = holo
             data = im.fromarray(holo).convert('RGB')
-            fname = 'temp' + str(ctr).zfill(2) + '.png'
-            data.save(fname)
+            data.save('temp.png')
+            png = wx.Image('temp.png', wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+            self.holo.updateIMG(png)
+            self.curdis.SetBitmap(scale_bitmap(png, 0.4))
+        else: # time sharing
+            # delete previous tempXX.png files
+            png_list = glob.glob('temp[0123456789][0123456789].png')
+            for fname in png_list:
+                os.remove(fname)
 
-        self.ImageSeqNum = 0
-        self.UpdateFlag = True
-        self.ChangedFlag = True
+            for pt, ctr in zip(ptsarr, np.arange(len(pts))):
+                holo = mySLMengine.calc_holo(np.array([pt])) # single point hologram
+                data = im.fromarray(holo).convert('RGB')
+                fname = 'temp' + str(ctr).zfill(2) + '.png'
+                data.save(fname)
 
-        #self.curDisplayPic = mySLMengine.calc_holo(ptsarr) # a ndarray
-        #data = im.fromarray(mySLMengine.calc_holo(ptsarr)).convert('RGB')
-        #data.save('temp.png')
-        #png = wx.Image('temp.png', wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-        #self.holo.updateIMG(png)
-        #self.curdis.SetBitmap(scale_bitmap(png,0.4))
-
+            self.ImageSeqNum = 0
+            self.UpdateFlag = True
+            self.ChangedFlag = True
 
 
     def arrTObitmap(self,array):
@@ -166,7 +172,7 @@ class appPanel(wx.Panel):
 
 
     def OnTimer(self, event):
-        if self.UpdateFlag is True:
+        if (self.UpdateFlag is True) and (self.multitrap_rb.GetSelection() == 1):
             # list all files named tempXX.png
             png_list = glob.glob('temp[0123456789][0123456789].png')
             png_list.sort()
