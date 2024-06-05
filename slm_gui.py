@@ -107,7 +107,7 @@ class appPanel(wx.Panel):
         self.ChangedFlag = False
         self.timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.OnTimer)
-        self.timer.Start(self.update_time_ms)
+        #self.timer.Start(self.update_time_ms)
 
         self.ImgSeqNum = 0 # Flag to point to different
 
@@ -128,10 +128,11 @@ class appPanel(wx.Panel):
                     pt = str(pt).replace("(","").replace(")","").split(",")
                     ptsarr.append([float(pt[0]),float(pt[1]),float(pt[2])])
 
-        print(float(self.pxVal.GetValue()), float(self.WaveLenVal.GetValue()), float(self.flocalLenVal.GetValue()))
+        #print(float(self.pxVal.GetValue()), float(self.WaveLenVal.GetValue()), float(self.flocalLenVal.GetValue()))
         mySLMengine = pyhot.SLM(self.geo[3],self.geo[2],float(self.pxVal.GetValue()), float(self.WaveLenVal.GetValue()), float(self.flocalLenVal.GetValue()))
 
         if self.multitrap_rb.GetSelection() == 0: # Simultaneous display
+            self.timer.Stop()
             holo = mySLMengine.calc_holo(ptsarr)
             self.curDisplayPic = holo
             data = im.fromarray(holo).convert('RGB')
@@ -176,7 +177,7 @@ class appPanel(wx.Panel):
 
 
     def OnTimer(self, event):
-        if (self.UpdateFlag is True) and (self.multitrap_rb.GetSelection() == 1):
+        if self.UpdateFlag is True:
             # list all files named tempXX.png
             png_list = glob.glob('temp[0123456789][0123456789].png')
             png_list.sort()
