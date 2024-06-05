@@ -164,7 +164,7 @@ class appPanel(wx.Panel):
 
     def arrTObitmap(self,array):
         h,w = array.shape[0], array.shape[1]
-        print(len(array.shape))
+        #print(len(array.shape))
         if len(array.shape) == 2:
             bw_array = array.copy()
             bw_array.shape = h, w, 1
