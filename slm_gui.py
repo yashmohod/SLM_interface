@@ -59,20 +59,21 @@ class appPanel(wx.Panel):
                         )
         self.holo.Show()
 
-
-        self.pxL = wx.StaticText(self, label="px", pos=(20,500))
-        self.pxVal = wx.TextCtrl(self, value="", pos=(110,500), size=(100,-1))
-        self.flocalLenL = wx.StaticText(self, label="Focal Length", pos=(20,530))
-        self.flocalLenVal = wx.TextCtrl(self, value="", pos=(110,530), size=(100,-1))
-        self.WaveLenL = wx.StaticText(self, label="Wave Length", pos=(20,560))
-        self.WaveLenVal = wx.TextCtrl(self, value="", pos=(110,560), size=(100,-1))
+        self.unitsL = wx.StaticText(self, label = "Use any consistent length units.",
+                                    pos = (20, 500))
+        self.pxL = wx.StaticText(self, label="Pixel size", pos=(20,550))
+        self.pxVal = wx.TextCtrl(self, value="", pos=(110,550), size=(100,-1))
+        self.flocalLenL = wx.StaticText(self, label="Focal length", pos=(20,580))
+        self.flocalLenVal = wx.TextCtrl(self, value="", pos=(110,580), size=(100,-1))
+        self.WaveLenL = wx.StaticText(self, label="Wavelength", pos=(20,610))
+        self.WaveLenVal = wx.TextCtrl(self, value="", pos=(110,610), size=(100,-1))
 
         self.multitrap_rb = wx.RadioBox(self, label = 'Multiple trap method',
-                                        pos = (20, 600),
+                                        pos = (20, 650),
                                         choices = ['Simultaneous', 'Time-shared'])
         self.update_timeL = wx.StaticText(self, label = 'Time share period [ms]',
-                                          pos = (20, 660))
-        self.update_timeVal = wx.TextCtrl(self, value = '50', pos = (160, 660),
+                                          pos = (20, 710))
+        self.update_timeVal = wx.TextCtrl(self, value = '50', pos = (160, 710),
                                           size = (50, -1))
 
 
