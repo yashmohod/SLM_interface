@@ -71,8 +71,8 @@ class appPanel(wx.Panel):
                                         pos = (20, 600),
                                         choices = ['Simultaneous', 'Time-shared'])
         self.update_timeL = wx.StaticText(self, label = 'Time share period [ms]',
-                                          pos = (20, 650))
-        self.update_timeVal = wx.TextCtrl(self, value = '50', pos = (160, 650),
+                                          pos = (20, 660))
+        self.update_timeVal = wx.TextCtrl(self, value = '50', pos = (160, 660),
                                           size = (50, -1))
 
 
