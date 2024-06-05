@@ -3,6 +3,8 @@ from screeninfo import get_monitors
 import numpy as np
 from PIL import Image as im
 import pyhot
+import os
+import glob
 
 class MainApp(wx.App):
     def __init__(self):
@@ -57,13 +59,22 @@ class appPanel(wx.Panel):
                         )
         self.holo.Show()
 
+        self.unitsL = wx.StaticText(self, label = "Use any consistent length units.",
+                                    pos = (20, 500))
+        self.pxL = wx.StaticText(self, label="Pixel size", pos=(20,530))
+        self.pxVal = wx.TextCtrl(self, value="", pos=(110,530), size=(100,-1))
+        self.flocalLenL = wx.StaticText(self, label="Focal length", pos=(20,560))
+        self.flocalLenVal = wx.TextCtrl(self, value="", pos=(110,560), size=(100,-1))
+        self.WaveLenL = wx.StaticText(self, label="Wavelength", pos=(20,590))
+        self.WaveLenVal = wx.TextCtrl(self, value="", pos=(110,590), size=(100,-1))
 
-        self.pxL = wx.StaticText(self, label="px", pos=(20,500))
-        self.pxVal = wx.TextCtrl(self, value="", pos=(110,500), size=(100,-1))
-        self.flocalLenL = wx.StaticText(self, label="Focal Length", pos=(20,530))
-        self.flocalLenVal = wx.TextCtrl(self, value="", pos=(110,530), size=(100,-1))
-        self.WaveLenL = wx.StaticText(self, label="Wave Length", pos=(20,560))
-        self.WaveLenVal = wx.TextCtrl(self, value="", pos=(110,560), size=(100,-1))
+        self.multitrap_rb = wx.RadioBox(self, label = 'Multiple trap method',
+                                        pos = (20, 650),
+                                        choices = ['Simultaneous', 'Time-shared'])
+        self.update_timeL = wx.StaticText(self, label = 'Time share period [ms]',
+                                          pos = (20, 710))
+        self.update_timeVal = wx.TextCtrl(self, value = '50', pos = (160, 710),
+                                          size = (50, -1))
 
 
 
@@ -91,8 +102,24 @@ class appPanel(wx.Panel):
         updateDisplay = wx.Button(self,id = wx.ID_ANY, size= (200,40),pos = (500,500),label= "Update Display")
         updateDisplay.Bind(wx.EVT_BUTTON,self.updateDisplay)
 
+        # timer for updating
+        self.update_time_ms = int(self.update_timeVal.GetValue())
+        self.UpdateFlag = False
+        self.ChangedFlag = False
+        self.timer = wx.Timer(self)
+        self.Bind(wx.EVT_TIMER, self.OnTimer)
+        #self.timer.Start(self.update_time_ms)
+
+        self.ImgSeqNum = 0 # Flag to point to different
+
 
     def updateDisplay(self,event):
+        '''
+        Calculates hologram for n points and updates the display, or
+        calculates a series of single-point holograms and loops through
+        displaying them.
+        '''
+
         pts = self.points.GetValue()
         pts = pts.split("\n")
         ptsarr=[]
@@ -102,20 +129,42 @@ class appPanel(wx.Panel):
                     pt = str(pt).replace("(","").replace(")","").split(",")
                     ptsarr.append([float(pt[0]),float(pt[1]),float(pt[2])])
 
-        print(float(self.pxVal.GetValue()), float(self.WaveLenVal.GetValue()), float(self.flocalLenVal.GetValue()))
-        mySLMengine = pyhot_backup.SLM(self.geo[3],self.geo[2],float(self.pxVal.GetValue()), float(self.WaveLenVal.GetValue()), float(self.flocalLenVal.GetValue()))
-        self.curDisplayPic = mySLMengine.calc_holo(ptsarr)
-        data = im.fromarray(mySLMengine.calc_holo(ptsarr)).convert('RGB')
-        data.save('temp.png')
-        png = wx.Image('temp.png', wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-        self.holo.updateIMG(png)
-        self.curdis.SetBitmap(scale_bitmap(png,0.4))
+        #print(float(self.pxVal.GetValue()), float(self.WaveLenVal.GetValue()), float(self.flocalLenVal.GetValue()))
+        mySLMengine = pyhot.SLM(self.geo[3],self.geo[2],float(self.pxVal.GetValue()), float(self.WaveLenVal.GetValue()), float(self.flocalLenVal.GetValue()))
 
+        if self.multitrap_rb.GetSelection() == 0: # Simultaneous display
+            self.timer.Stop()
+            holo = mySLMengine.calc_holo(ptsarr)
+            self.curDisplayPic = holo
+            data = im.fromarray(holo).convert('RGB')
+            data.save('temp.png')
+            png = wx.Image('temp.png', wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+            self.holo.updateIMG(png)
+            self.curdis.SetBitmap(scale_bitmap(png, 0.4))
+        else: # time sharing
+            # update timer interval
+            self.update_time_ms = int(self.update_timeVal.GetValue())
+            self.timer.Start(self.update_time_ms)
+
+            # delete previous tempXX.png files
+            png_list = glob.glob('temp[0123456789][0123456789].png')
+            for fname in png_list:
+                os.remove(fname)
+
+            for pt, ctr in zip(ptsarr, np.arange(len(pts))):
+                holo = mySLMengine.calc_holo(np.array([pt])) # single point hologram
+                data = im.fromarray(holo).convert('RGB')
+                fname = 'temp' + str(ctr).zfill(2) + '.png'
+                data.save(fname)
+
+            self.ImageSeqNum = 0
+            self.UpdateFlag = True
+            self.ChangedFlag = True
 
 
     def arrTObitmap(self,array):
         h,w = array.shape[0], array.shape[1]
-        print(len(array.shape))
+        #print(len(array.shape))
         if len(array.shape) == 2:
             bw_array = array.copy()
             bw_array.shape = h, w, 1
@@ -127,6 +176,31 @@ class appPanel(wx.Panel):
         # png = img.ConvertToBitmap()
         return wx.Bitmap(img)
 
+
+    def OnTimer(self, event):
+        if self.UpdateFlag is True:
+            # list all files named tempXX.png
+            png_list = glob.glob('temp[0123456789][0123456789].png')
+            png_list.sort()
+            #print(png_list)
+            n_imgs = len(png_list)
+
+            if (n_imgs == 1) and (self.ChangedFlag is False):
+                return
+            else:
+                # update displays
+                fname = 'temp' + str(self.ImageSeqNum).zfill(2) + '.png'
+                png = wx.Image(fname, wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+                self.holo.updateIMG(png)
+                self.curdis.SetBitmap(scale_bitmap(png,0.4))
+
+                # update pointer
+                if self.ImageSeqNum == (n_imgs - 1): # cycle back
+                    self.ImageSeqNum = 0
+                else:
+                    self.ImageSeqNum += 1
+
+                self.ChangedFlag = False
 
 class hologram(wx.Frame):
     def __init__(self,parent, pos,size,img):
