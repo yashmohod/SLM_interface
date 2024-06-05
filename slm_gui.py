@@ -140,6 +140,10 @@ class appPanel(wx.Panel):
             self.holo.updateIMG(png)
             self.curdis.SetBitmap(scale_bitmap(png, 0.4))
         else: # time sharing
+            # update timer interval
+            self.update_time_ms = int(self.update_timeVal.GetValue())
+            self.timer.Start(self.update_time_ms)
+
             # delete previous tempXX.png files
             png_list = glob.glob('temp[0123456789][0123456789].png')
             for fname in png_list:
