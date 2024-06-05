@@ -61,12 +61,12 @@ class appPanel(wx.Panel):
 
         self.unitsL = wx.StaticText(self, label = "Use any consistent length units.",
                                     pos = (20, 500))
-        self.pxL = wx.StaticText(self, label="Pixel size", pos=(20,550))
-        self.pxVal = wx.TextCtrl(self, value="", pos=(110,550), size=(100,-1))
-        self.flocalLenL = wx.StaticText(self, label="Focal length", pos=(20,580))
-        self.flocalLenVal = wx.TextCtrl(self, value="", pos=(110,580), size=(100,-1))
-        self.WaveLenL = wx.StaticText(self, label="Wavelength", pos=(20,610))
-        self.WaveLenVal = wx.TextCtrl(self, value="", pos=(110,610), size=(100,-1))
+        self.pxL = wx.StaticText(self, label="Pixel size", pos=(20,530))
+        self.pxVal = wx.TextCtrl(self, value="", pos=(110,530), size=(100,-1))
+        self.flocalLenL = wx.StaticText(self, label="Focal length", pos=(20,560))
+        self.flocalLenVal = wx.TextCtrl(self, value="", pos=(110,560), size=(100,-1))
+        self.WaveLenL = wx.StaticText(self, label="Wavelength", pos=(20,590))
+        self.WaveLenVal = wx.TextCtrl(self, value="", pos=(110,590), size=(100,-1))
 
         self.multitrap_rb = wx.RadioBox(self, label = 'Multiple trap method',
                                         pos = (20, 650),
