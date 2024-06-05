@@ -99,7 +99,7 @@ class appPanel(wx.Panel):
         self.ChangedFlag = False
         self.timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.OnTimer)
-        self.timer.Start(self.update_time_ms) 
+        self.timer.Start(self.update_time_ms)
 
         self.ImgSeqNum = 0 # Flag to point to different
 
