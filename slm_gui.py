@@ -102,7 +102,7 @@ class appPanel(wx.Panel):
         updateDisplay.Bind(wx.EVT_BUTTON,self.updateDisplay)
 
         # timer for updating
-        self.update_time_ms = int(self.update_timeL.GetValue())
+        self.update_time_ms = int(self.update_timeVal.GetValue())
         self.UpdateFlag = False
         self.ChangedFlag = False
         self.timer = wx.Timer(self)
