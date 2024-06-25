@@ -3,4 +3,4 @@ __pycache__/
 *.py[cod]
 venv
 *.png
-
+dll_path_config.yaml

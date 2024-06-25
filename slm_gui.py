@@ -5,10 +5,16 @@ from PIL import Image as im
 import pyhot
 import os
 import glob
+import yaml 
+
+from thorlabs_tsi_sdk.tl_camera import TLCameraSDK
 
 class MainApp(wx.App):
     def __init__(self):
         super().__init__(clearSigInt = True)
+
+        # initialize camera
+        self.init_camera()
 
         # init frames
         self.InitAppFrame()
@@ -27,6 +33,37 @@ class MainApp(wx.App):
                        size=(self.Xsize,self.Ysize),
                        )
         gui.Show()
+
+        
+    def init_camera(self):
+        gui_dir_abs_path = os.path.dirname(os.path.abspath(__file__))
+        config_fname = os.path.abspath(gui_dir_abs_path) + os.sep + 'dll_path_config.yaml'
+        with open(config_fname, mode = 'r') as file:
+            config = yaml.safe_load(file)
+        dll_abs_path = config['dll_absolute_path']
+        os.environ['PATH'] = dll_abs_path + os.pathsep + os.environ['PATH']
+        os.add_dll_directory(dll_abs_path)
+        
+        sdk = TLCameraSDK()
+        available_cameras = sdk.discover_available_cameras()
+        if len(available_cameras) < 1:
+            print("no cameras detected")
+        else:
+            camera = sdk.open_camera(available_cameras[0])
+            camera.exposure_time_us = 5000 # 5 ms
+            camera.image_poll_timeout_ms = 1000
+            camera.frames_per_trigger_zero_for_unlimited = 1
+            camera.arm(1)
+        
+        
+    
+    def OnExit(self):
+        '''
+        put cleanup code here
+        '''
+        camera.disarm()
+        camera.dispose()
+        sdk.dispose()
 
 
 class appFrame(wx.Frame):
@@ -106,12 +143,26 @@ class appPanel(wx.Panel):
         self.update_time_ms = int(self.update_timeVal.GetValue())
         self.UpdateFlag = False
         self.ChangedFlag = False
-        self.timer = wx.Timer(self)
-        self.Bind(wx.EVT_TIMER, self.OnTimer)
+        self.timer = wx.Timer(self, id = 2)
+        self.Bind(wx.EVT_TIMER, self.OnTimer, id = 2)
         #self.timer.Start(self.update_time_ms)
 
         self.ImgSeqNum = 0 # Flag to point to different
+        
+        # Create a second timer for acquiring video frames 
+        self.cam_timer = wx.Timer(self, id = 1)
+        self.Bind(wx.EVT_TIMER, self.show_camera, id = 1)
+        # triggers at 20 frames/sec (every 50 ms)
+        self.cam_timer.Start(50)
 
+
+    def show_camera(self, event):
+        camera.issue_software_trigger()
+        frame = camera.get_pending_frame_or_null()
+        if frame is not None:
+            image_buffer_copy = np.copy(frame.image_buffer)
+            self.curdis.SetBitmap(scale_bitmap(self.arrTObitmap(image_buffer_copy), 0.4))
+        
 
     def updateDisplay(self,event):
         '''
