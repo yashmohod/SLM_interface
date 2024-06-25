@@ -53,7 +53,9 @@ class MainApp(wx.App):
             camera.exposure_time_us = 5000 # 5 ms
             camera.image_poll_timeout_ms = 1000
             camera.frames_per_trigger_zero_for_unlimited = 1
-            camera.arm(1)
+            print("got here")
+            #camera.disarm()
+            camera.arm(2)
         
         
     
