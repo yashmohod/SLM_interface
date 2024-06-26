@@ -9,12 +9,43 @@ import yaml
 
 from thorlabs_tsi_sdk.tl_camera import TLCameraSDK
 
-class MainApp(wx.App):
+class CameraContainer(object):
     def __init__(self):
+        gui_dir_abs_path = os.path.dirname(os.path.abspath(__file__))
+        config_fname = os.path.abspath(gui_dir_abs_path) + os.sep + 'dll_path_config.yaml'
+        with open(config_fname, mode = 'r') as file:
+            config = yaml.safe_load(file)
+        dll_abs_path = config['dll_absolute_path']
+        os.environ['PATH'] = dll_abs_path + os.pathsep + os.environ['PATH']
+        os.add_dll_directory(dll_abs_path)
+        
+        self.sdk = TLCameraSDK()
+        
+        available_cameras = self.sdk.discover_available_cameras()
+        if len(available_cameras) < 1:
+            print("no cameras detected")
+            self.camera = None
+        else:
+            self.camera = sdk.open_camera(available_cameras[0])
+            self.camera.exposure_time_us = 5000 # 5 ms
+            self.camera.image_poll_timeout_ms = 1000
+            self.camera.frames_per_trigger_zero_for_unlimited = 1
+            self.camera.arm(2)
+            
+    def _cleanup(self):
+        if self.camera is not None:
+            self.camera.disarm()
+            self.camera.dispose()
+        self.sdk.dispose()
+        
+        
+
+class MainApp(wx.App):
+    def __init__(self, cam_object):
         super().__init__(clearSigInt = True)
 
-        # initialize camera
-        self.init_camera()
+        # holds camera object
+        self.camera_object = cam_object
 
         # init frames
         self.InitAppFrame()
@@ -31,56 +62,33 @@ class MainApp(wx.App):
                        title="SLM",
                        pos=(self.X,self.Y),
                        size=(self.Xsize,self.Ysize),
+                       camera_object = self.camera_object
                        )
         gui.Show()
-
-        
-    def init_camera(self):
-        gui_dir_abs_path = os.path.dirname(os.path.abspath(__file__))
-        config_fname = os.path.abspath(gui_dir_abs_path) + os.sep + 'dll_path_config.yaml'
-        with open(config_fname, mode = 'r') as file:
-            config = yaml.safe_load(file)
-        dll_abs_path = config['dll_absolute_path']
-        os.environ['PATH'] = dll_abs_path + os.pathsep + os.environ['PATH']
-        os.add_dll_directory(dll_abs_path)
-        
-        sdk = TLCameraSDK()
-        available_cameras = sdk.discover_available_cameras()
-        if len(available_cameras) < 1:
-            print("no cameras detected")
-        else:
-            camera = sdk.open_camera(available_cameras[0])
-            camera.exposure_time_us = 5000 # 5 ms
-            camera.image_poll_timeout_ms = 1000
-            camera.frames_per_trigger_zero_for_unlimited = 1
-            print("got here")
-            #camera.disarm()
-            camera.arm(2)
-        
         
     
     def OnExit(self):
         '''
         put cleanup code here
         '''
-        camera.disarm()
-        camera.dispose()
-        sdk.dispose()
+        self.camera_object._cleanup()
 
 
 class appFrame(wx.Frame):
-    def __init__(self,parent,title, pos,size):
-        super().__init__(parent = parent, title = title, pos = pos, size = size)
+    def __init__(self,parent,title, pos,size, camera_object):
+        super().__init__(parent = parent, title = title, pos = pos, size = size )
         self.OnInit()
+        self.camera_object = camera_object
 
     def OnInit(self):
-        guiPanel = appPanel(parent=self)
+        guiPanel = appPanel(parent=self, camera_object = self.camera_object)
 
 class appPanel(wx.Panel):
-    def __init__(self,parent):
+    def __init__(self,parent, camera_object):
         super().__init__(parent = parent)
         self.holograms=[]
         self.OnInit()
+        self.camera_object = camera_object
 
     def OnInit(self):
         self.monitor_count = wx.Display.GetCount()
@@ -159,8 +167,8 @@ class appPanel(wx.Panel):
 
 
     def show_camera(self, event):
-        camera.issue_software_trigger()
-        frame = camera.get_pending_frame_or_null()
+        self.camera_object.camera.issue_software_trigger()
+        frame = self.camera_object.camera.get_pending_frame_or_null()
         if frame is not None:
             image_buffer_copy = np.copy(frame.image_buffer)
             self.curdis.SetBitmap(scale_bitmap(self.arrTObitmap(image_buffer_copy), 0.4))
@@ -305,5 +313,6 @@ def scale_bitmap(bitmap,ratio):
     return result
 
 if __name__ == "__main__":
+    cam_container = CameraContainer()
     app = MainApp()
     app.MainLoop()
