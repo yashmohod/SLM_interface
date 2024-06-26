@@ -171,7 +171,8 @@ class appPanel(wx.Panel):
         frame = self.camera_object.camera.get_pending_frame_or_null()
         if frame is not None:
             image_buffer_copy = np.copy(frame.image_buffer)
-            self.curdis.SetBitmap(scale_bitmap(self.arrTObitmap(image_buffer_copy), 0.4))
+            self.curdis.SetBitmap(scale_bitmap(self.arrTObitmap2(image_buffer_copy, 
+                                                                 self.camera_object.camera.bit_depth), 0.5))
         
 
     def updateDisplay(self,event):
@@ -236,6 +237,23 @@ class appPanel(wx.Panel):
         img = wx.ImageFromBuffer(width=w, height=h, dataBuffer=data)
         # png = img.ConvertToBitmap()
         return wx.Bitmap(img)
+
+
+    def arrTObitmap2(self, array, bits):
+        '''
+        Convert grayscale Numpy array from Thorlabs camera (2D) to a wx Bitmap object.
+        See discussion at
+        https://stackoverflow.com/questions/65283588/display-numpy-array-cv2-image-in-wxpython-correctly
+        '''
+        h, w = array.shape[:2]
+        # Input images from camera are uint16, but bit depth is user-settable 
+        # Normalize image and convert to 0-255
+        data = array.astype(np.float64) / (2**bits - 1) * 255
+        data = data.astype(np.uint8)
+        # Now need to cast to rgb by duplicating channels
+        color_data = np.repeat(data[:, :, np.newaxis], 3, axis = 2)
+        return wx.Bitmap.FromBuffer(width = w, height = h, data = color_data)
+        
 
 
     def OnTimer(self, event):
