@@ -26,7 +26,7 @@ class CameraContainer(object):
             print("no cameras detected")
             self.camera = None
         else:
-            self.camera = sdk.open_camera(available_cameras[0])
+            self.camera = self.sdk.open_camera(available_cameras[0])
             self.camera.exposure_time_us = 5000 # 5 ms
             self.camera.image_poll_timeout_ms = 1000
             self.camera.frames_per_trigger_zero_for_unlimited = 1
@@ -77,8 +77,8 @@ class MainApp(wx.App):
 class appFrame(wx.Frame):
     def __init__(self,parent,title, pos,size, camera_object):
         super().__init__(parent = parent, title = title, pos = pos, size = size )
-        self.OnInit()
         self.camera_object = camera_object
+        self.OnInit()
 
     def OnInit(self):
         guiPanel = appPanel(parent=self, camera_object = self.camera_object)
@@ -314,5 +314,5 @@ def scale_bitmap(bitmap,ratio):
 
 if __name__ == "__main__":
     cam_container = CameraContainer()
-    app = MainApp()
+    app = MainApp(cam_container)
     app.MainLoop()
