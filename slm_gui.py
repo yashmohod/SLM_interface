@@ -83,9 +83,14 @@ class appFrame(wx.Frame):
         self.camera_object = camera_object
         self.OnInit()
         self.InitUI()
+        self.Bind(wx.EVT_CLOSE, self.OnClose)
 
     def OnInit(self):
         guiPanel = appPanel(parent=self, camera_object = self.camera_object)
+        
+    def OnClose(self):
+        self.camera_object._cleanup()
+        self.Destroy()
         
     def InitUI(self):
         self.CreateMenuBar()
