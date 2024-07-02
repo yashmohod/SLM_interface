@@ -86,10 +86,11 @@ class appFrame(wx.Frame):
         self.Bind(wx.EVT_CLOSE, self.OnClose)
 
     def OnInit(self):
-        guiPanel = appPanel(parent=self, camera_object = self.camera_object)
+        self.guiPanel = appPanel(parent=self, camera_object = self.camera_object)
         
     def OnClose(self, event):
         self.camera_object._cleanup()
+        self.guiPanel.Destroy()
         self.Destroy()
         
     def InitUI(self):
