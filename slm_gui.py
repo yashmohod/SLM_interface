@@ -38,6 +38,7 @@ class CameraContainer(object):
             self.camera.disarm()
             self.camera.dispose()
         self.sdk.dispose()
+        print("Camera was closed")
         
         
 
@@ -72,6 +73,7 @@ class MainApp(wx.App):
         '''
         put cleanup code here
         '''
+        print("main app onexit")
         self.camera_object._cleanup()
 
 
@@ -98,7 +100,7 @@ class appFrame(wx.Frame):
         saveSubMenu = wx.Menu()
         
         saveSubMenu.Append(201, 'Save sequence of images', 'Save sequence of images')
-        fileMenu.AppendSubMenu(saveSubMenu, 'Save')
+        fileMenu.AppendSubMenu(saveSubMenu, 'Acquire')
        
        
 
@@ -156,22 +158,32 @@ class appFrame(wx.Frame):
         
       
     def OnStartAcquisition(self,e,path,filename,num_images,frame_rate):
-        frame_interval = 1.0/float(frame_rate)
+        
+        self.camera_object.camera.disarm()
+        self.camera_object.camera.frames_per_trigger_zero_for_unlimited = num_images
+        self.camera_object.camera.frame_rate_control_value = float(frame_rate) 
+        self.camera_object.camera.arm(num_images+1)
+        self.camera_object.camera.issue_software_trigger()
         
         for i in range(num_images):
-          self.camera_object.camera.issue_software_trigger()
-          frame =self.camera_object.camera.get_pending_frame_or_null()
+          frame = self.camera_object.camera.get_pending_frame_or_null()
           if frame is not None:
          
             image_data = np.copy(frame.image_buffer)
             pil_image = im.fromarray(image_data)
           
-            image_filename = f"{filename}_{i+1}.png"
+            image_filename = filename + str(i).zfill(3) + '.tif'
             image_filepath=os.path.join(path, image_filename)
           
             pil_image.save(image_filepath)
             print(f"Saved image {i+1}/{num_images} to {image_filepath}")
-            time.sleep(frame_interval)
+          else:
+            print("timeout reached")
+            break
+        
+        self.camera_object.camera.disarm()
+        self.camera_object.camera.frames_per_trigger_zero_for_unlimited = 1
+        self.camera_object.camera.arm(2)
           
         
           
