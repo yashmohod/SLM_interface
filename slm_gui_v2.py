@@ -24,6 +24,7 @@ class MainApp(wx.App):
         self.identify_displays()
         self.main_frame = self.init_main_window()
         self.main_frame.Show()
+        
         self.slm_frame = self.init_slm_window()
         self.slm_frame.Show()
         

@@ -6,6 +6,7 @@ import os
 import numpy as np
 import yaml
 import pyhot
+from pubsub import pub
 
 
 class SLMContainer(object):
@@ -19,3 +20,6 @@ class SLMContainer(object):
         self.slm_pixel_size = config['slm_pixel_size']
         self.slm_display_shape = tuple(config['slm_display_shape'])
         
+    def _blank_img_array(self):
+        #return np.zeros((slm_display_shape))
+        pass
