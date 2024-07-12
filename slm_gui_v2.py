@@ -20,7 +20,7 @@ class MainApp(wx.App):
         super().__init__(redirect = False, clearSigInt = True)
         self.main_window_scale_factor = 0.7
         self.slm_object =  SLMContainer()
-        self.cam_object = CameraContainer()
+        self.camera_object = CameraContainer()
         self.identify_displays()
         self.main_frame = self.init_main_window()
         self.main_frame.Show()
