@@ -14,7 +14,7 @@ class MainApp(wx.App):
     MainApp contains camera object and two Frames, one for main monitor,
     one for SLM
     '''
-    def __init__(self, cam_object):
+    def __init__(self):
         super().__init__(redirect = False, clearSigInt = True)
         self.main_window_scale_factor = 0.7
         self.slm_object =  SLMContainer()
