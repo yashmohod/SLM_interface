@@ -8,7 +8,7 @@ import yaml
 import pyhot
 
 
-class SLMContainer(class):
+class SLMContainer(object):
     def __init__(self):
         gui_dir_abs_path = os.path.dirname(os.path.abspath(__file__))
         config_fname = os.path.abspath(gui_dir_abs_path) + os.sep + 'optical_train_config.yaml'
