@@ -12,7 +12,7 @@ class SLMWindow(wx.Frame):
     def __init__(self, parent, pos, size):
         super().__init__(parent = parent, pos = pos, size = size, 
                          style = wx.NO_BORDER)
-        pub.suscribe(self.update_listener, "update_slm")
+        pub.subscribe(self.update_listener, "update_slm")
                          
     def update_listener():
         pass
