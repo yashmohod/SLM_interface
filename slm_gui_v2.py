@@ -61,8 +61,8 @@ class MainApp(wx.App):
     def init_main_window(self):
         # Calculate appropriate size to center on main monitor 
         main_display_geo = self.main_display.GetGeometry()
-        main_window_pos = (np.array(main_display_geo[2:4]) * 
-                           (1 - 0.5 * self.main_window_scale_factor)).round().astype('int')
+        main_window_pos = (np.array(main_display_geo[2:4]) * 0.5 *
+                           (1 - self.main_window_scale_factor)).round().astype('int')
         main_window_size = (self.main_window_scale_factor * 
                             np.array(main_display_geo[2:4])).round().astype('int')
         return MainWindowFrame(pos = main_window_pos,
