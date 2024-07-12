@@ -9,6 +9,7 @@ import time
 from thorcam_container import CameraContainer
 from slm_container import SLMContainer 
 from main_window import MainWindow
+from slm_window import SLMWindow 
 
 class MainApp(wx.App):
     '''
@@ -24,6 +25,8 @@ class MainApp(wx.App):
         self.main_frame = self.init_main_window()
         self.main_frame.Show()
         self.slm_frame = self.init_slm_window()
+        self.slm_frame.Show()
+        
         
     def identify_displays(self):
         '''
@@ -66,12 +69,13 @@ class MainApp(wx.App):
                            (1 - self.main_window_scale_factor)).round().astype('int')
         main_window_size = (self.main_window_scale_factor * 
                             np.array(main_display_geo[2:4])).round().astype('int')
-        return MainWindow(pos = main_window_pos, size = main_window_size,
-                          camera_object = self.camera_object)
+        return MainWindow(pos = main_window_pos, size = main_window_size)
         
         
     def init_slm_window(self):
-        pass
+        slm_display_geo = self.slm_display.GetGeometry()
+        return SLMWindow(parent = self.main_frame, pos = slm_display_geo[0:2],
+                         size = slm_display_geo[2:4])
         
         
 
