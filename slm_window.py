@@ -9,7 +9,7 @@ class SLMWindow(wx.Frame):
     '''
     This window needs to be a child of the main window so that it closes when main window closes
     '''
-    def __init__(parent, pos, size):
+    def __init__(self, parent, pos, size):
         super().__init__(parent = parent, pos = pos, size = size, 
                          style = wx.NO_BORDER)
         pub.suscribe(self.update_listener, "update_slm")
