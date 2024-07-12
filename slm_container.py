@@ -17,5 +17,5 @@ class SLMContainer(object):
         
         self.wavelength = config['wavelength']
         self.slm_pixel_size = config['slm_pixel_size']
-        self.slm_display_shape = config['slm_display_shape']
+        self.slm_display_shape = tuple(config['slm_display_shape'])
         
