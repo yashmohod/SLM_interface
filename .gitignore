@@ -4,3 +4,5 @@ __pycache__/
 venv
 *.png
 dll_path_config.yaml
+optical_train_config.yaml
+

@@ -1,0 +1,11 @@
+# Template for configuration file giving default values for optical  
+# train parameters. Any self-consistent length units can be used.
+# Users should copy this file, rename it to optical_train_config.yaml, and modify 
+# as needed.
+
+{
+    wavelength: 1.064 # float
+    slm_pixel_size: 8.0 # float 
+    slm_display_shape: [1920, 1200]
+    slm_model_name: "Exulus HD3"
+}
