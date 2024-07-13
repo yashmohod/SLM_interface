@@ -5,6 +5,8 @@
 
 wavelength: 1.064 # float
 
+objective_focal_length: 3333.3
+
 slm_pixel_size: 8.0 # float 
 
 slm_display_shape: [1920, 1200]

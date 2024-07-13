@@ -6,6 +6,7 @@ import os
 import numpy as np
 import yaml
 import pyhot
+import wx
 from pubsub import pub
 
 
@@ -19,4 +20,12 @@ class SLMContainer(object):
         self.wavelength = config['wavelength']
         self.slm_pixel_size = config['slm_pixel_size']
         self.slm_display_shape = tuple(config['slm_display_shape'])
+        self.objective_focal_length = config['objective_focal_length']
+        
+        self.slm_engine = pyhot.SLM(self.slm_display_shape[1], self.slm_display_shape[0],
+                                    self.wavelength, self.slm_pixel_size, 
+                                    self.objective_focal_length)
+                                    
+    # Implement wxTimer 
+    # Sends update messages
         

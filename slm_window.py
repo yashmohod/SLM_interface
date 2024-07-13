@@ -17,8 +17,12 @@ class SLMWindow(wx.Frame):
         self.current_display = wx.StaticBitmap(parent = self, id = wx.ID_ANY,
                                                bitmap = wx.EmptyImage(*self.size).ConvertToBitmap(),
                                                pos = (0,0))
-        #pub.subscribe(self.update_listener, "update_slm")
+        pub.subscribe(self.update_listener, "update_slm")
+
                          
-    def update_listener():
-        pass
+    def update_listener(self, image):
+        '''
+        Pass in a wx.Image object.
+        '''
+        self.current_display.SetBitmap(image.ConvertToBitmap())
     
