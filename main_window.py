@@ -262,7 +262,7 @@ class CameraPanel(wx.Panel):
     
     def scale_image_for_display(self, image):
         return image.Scale(round(self.camera_display_scale_factor * self.sensor_aspect_ratio * self.parent.Size[1]), 
-                                 round(self.parent.Size[1] * self.camera_dispaly_scale_factor), 
+                                 round(self.parent.Size[1] * self.camera_display_scale_factor), 
                                  wx.IMAGE_QUALITY_HIGH)
         
     def onResize(self, event):
