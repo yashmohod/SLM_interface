@@ -257,7 +257,7 @@ class CameraPanel(wx.Panel):
         # currently triggers at 20 frames/sec (every 50 ms)
         # TODO: make rate settable
         self.live_frame_time_ms = 50
-        self.live_cam_timer.Start(live_frame_time_ms)
+        self.live_cam_timer.Start(self.live_frame_time_ms)
         
     
     def scale_image_for_display(self, image):
