@@ -291,7 +291,7 @@ class CameraPanel(wx.Panel):
         self.Layout()
         
 
-    def show_camera_snapshot(self):
+    def show_camera_snapshot(self, event):
         self.camera_object.issue_software_trigger()
         frame = self.camera_object.camera.get_pending_frame_or_null()
         if frame is not None:
