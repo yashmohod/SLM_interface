@@ -8,7 +8,7 @@ import glob
 import yaml 
 import time
 
-from thorlabs_tsi_sdk.tl_camera import TLCameraSDK
+# from thorlabs_tsi_sdk.tl_camera import TLCameraSDK
 
 class CameraContainer(object):
     def __init__(self):
@@ -20,7 +20,7 @@ class CameraContainer(object):
         os.environ['PATH'] = dll_abs_path + os.pathsep + os.environ['PATH']
         os.add_dll_directory(dll_abs_path)
         
-        self.sdk = TLCameraSDK()
+        # self.sdk = TLCameraSDK()
         
         available_cameras = self.sdk.discover_available_cameras()
         if len(available_cameras) < 1:
@@ -449,7 +449,7 @@ class hologram(wx.Frame):
 
 
 
-# def scale_bitmap(bitmap, width, height):
+
 def scale_bitmap(bitmap,ratio):
     # image = wx.ImageFromBitmap(bitmap)
     image =  bitmap.ConvertToImage()
