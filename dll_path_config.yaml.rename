@@ -1,7 +1,0 @@
-# Template for configuration file giving path to Thorlabs camera DLLs.
-# Users should copy this file, rename it to dll_path_config.yaml, and modify 
-# as needed.
-
-{
-    dll_absolute_path : "C:/your/path/here"
-}

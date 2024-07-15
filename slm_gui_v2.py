@@ -6,8 +6,9 @@ import glob
 import time
 
 
-from thorcam_container import CameraContainer
-from slm_container import SLMContainer 
+
+# from thorcam_container import CameraContainer
+# from slm_container import SLMContainer 
 from main_window import MainWindow
 from slm_window import SLMWindow 
 
@@ -19,14 +20,21 @@ class MainApp(wx.App):
     def __init__(self):
         super().__init__(redirect = False, clearSigInt = True)
         self.main_window_scale_factor = 0.7
-        self.slm_object =  SLMContainer()
-        self.camera_object = CameraContainer()
-        self.identify_displays()
+        # self.slm_object =  SLMContainer()
+        # self.camera_object = CameraContainer()
+        # self.identify_displays()
+        
+        # temp 
+        self.main_display_index = 0
+        self.main_display = wx.Display(self.main_display_index)
+        #
+        
         self.main_frame = self.init_main_window()
         self.main_frame.Show()
         
-        self.slm_frame = self.init_slm_window()
-        self.slm_frame.Show()
+        
+        # self.slm_frame = self.init_slm_window()
+        # self.slm_frame.Show()
         
         
     def identify_displays(self):
