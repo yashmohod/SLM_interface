@@ -240,7 +240,7 @@ class CameraPanel(wx.Panel):
         self.camera_display_scale_factor = 0.5
          
         img = wx.Image(*self.sensor_shape) #creates blank image
-        scaled_img = scale_image_for_display(img)
+        scaled_img = self.scale_image_for_display(img)
         self.bitmap = scaled_img.ConvertToBitmap()
         self.curdis = wx.StaticBitmap(self, -1,self.bitmap)
         
