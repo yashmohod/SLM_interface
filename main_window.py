@@ -327,5 +327,3 @@ class SLMPanel(wx.Panel):
 
 
         
-
-
