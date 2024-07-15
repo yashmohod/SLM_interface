@@ -5,6 +5,7 @@ main_window.py
 import wx
 import numpy as np 
 from PIL import Image
+from utility import gray_ndarray_to_wxImage
 
 class MainWindow(wx.Frame):
     def __init__(self, pos, size):
@@ -148,24 +149,7 @@ class MainWindow(wx.Frame):
             
         exposure_dialog.Destroy()
     
-    def show_camera(self, event):
-        pass
-        # self.camera_object.camera.issue_software_trigger()
-        # frame = self.camera_object.camera.get_pending_frame_or_null()
-        # if frame is not None:
-        #     image_buffer_copy = np.copy(frame.image_buffer)
-        #     self.curdis.SetBitmap(scale_bitmap(self.arrTObitmap2(image_buffer_copy, 
-        #                                                          self.camera_object.camera.bit_depth), 0.5))
-        
 
-    
-        '''
-        Calculates hologram for n points and updates the display, or
-        calculates a series of single-point holograms and loops through
-        displaying them.
-        '''
-
-        pass
 
 def scale_bitmap(bitmap,ratio):
     # image = wx.ImageFromBitmap(bitmap)
@@ -243,14 +227,23 @@ class ControlPanel(wx.Panel):
 
 class CameraPanel(wx.Panel):
     def __init__(self,parent):
-        super().__init__(parent = parent )
+        super().__init__(parent = parent)
         
         self.v_sizer = wx.BoxSizer(wx.VERTICAL)
         self.parent = parent
-        img = np.zeros((1536,900,3))
-        img = wx.Bitmap.FromBuffer(1536, 900, img)
-        self.bitmap = scale_bitmap(wx.Bitmap(img),self.parent.Size[1]*0.50)
-        self.curdis = wx.StaticBitmap(self, -1,self.bitmap )
+        
+        self.camera_object = wx.GetApp().camera_object
+        
+        # blank image
+        self.sensor_shape = self.camera_object.camera_sensor_shape
+        self.sensor_aspect_ratio = self.sensor_shape[0]/self.sensor_shape[1]
+        self.camera_display_scale_factor = 0.5
+         
+        img = wx.Image(*self.sensor_shape) #creates blank image
+        scaled_img = scale_image_for_display(img)
+        self.bitmap = scaled_img.ConvertToBitmap()
+        self.curdis = wx.StaticBitmap(self, -1,self.bitmap)
+        
         self.v_sizer.Add(self.curdis, 1, wx.ALIGN_CENTER)
         self.SetSizer(self.v_sizer)
         self.Bind(wx.EVT_SIZE, self.onResize)
@@ -258,6 +251,19 @@ class CameraPanel(wx.Panel):
         self.wasFullscreen = 0
         self.restoreSize = self.parent.Size[1]*0.50
         
+        # Create a timer for acquiring video frames in live mode
+        self.live_cam_timer = wx.Timer(self, id = 1)
+        self.Bind(wx.EVT_TIMER, self.show_camera_snapshot, id = 1)
+        # currently triggers at 20 frames/sec (every 50 ms)
+        # TODO: make rate settable
+        self.live_frame_time_ms = 50
+        self.cam_timer.Start(live_frame_time_ms)
+        
+    
+    def scale_image_for_display(self, image):
+        return image.Scale(round(self.camera_display_scale_factor * self.sensor_aspect_ratio * self.parent.Size[1]), 
+                                 round(self.parent.Size[1] * self.camera_dispaly_scale_factor), 
+                                 wx.IMAGE_QUALITY_HIGH)
         
     def onResize(self, event):
         # if self.curdis.Size[1] !=round(self.parent.Size[1]*0.55):
@@ -285,11 +291,13 @@ class CameraPanel(wx.Panel):
         self.Layout()
         
 
-        
-    def updateCameraPanel(self,bitmapToSet):
-        
-        self.bitmap = scale_bitmap(bitmapToSet,self.parent.Size[1]*0.50)
-        self.curdis.SetBitmap(self.bitmap)
+    def show_camera_snapshot(self):
+        self.camera_object.issue_software_trigger()
+        frame = self.camera_object.camera.get_pending_frame_or_null()
+        if frame is not None:
+            image_buffer_copy = np.copy(frame.image_buffer)
+            image = self.scale_image_for_display(gray_ndarray_to_wxImage(image_buffer_copy))
+            self.curdis.SetBitmap(image.ConvertToBitmap())
             
 
 class SLMPanel(wx.Panel):

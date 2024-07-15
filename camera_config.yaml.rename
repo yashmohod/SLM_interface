@@ -1,0 +1,8 @@
+# Template for configuration file giving default values for camera  
+# parameters. 
+# Users should copy this file, rename it to camera_config.yaml, and modify 
+# as needed.
+
+camera_sensor_shape: [1440, 1080]
+
+camera_model_name: "Thorlabs CS165MU"

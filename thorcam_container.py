@@ -19,6 +19,12 @@ class CameraContainer(object):
         os.environ['PATH'] = dll_abs_path + os.pathsep + os.environ['PATH']
         os.add_dll_directory(dll_abs_path)
         
+        config_fname = os.path.abspath(gui_dir_abs_path) + os.sep + 'camera_config.yaml'
+        with open(config_fname, mode = 'r') as file:
+            config = yaml.safe_load(file)
+            
+        self.camera_sensor_shape = config['camera_sensor_shape']
+        
         self.sdk = TLCameraSDK()
         
         available_cameras = self.sdk.discover_available_cameras()
