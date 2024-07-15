@@ -292,7 +292,7 @@ class CameraPanel(wx.Panel):
         
 
     def show_camera_snapshot(self, event):
-        self.camera_object.issue_software_trigger()
+        self.camera_object.camera.issue_software_trigger()
         frame = self.camera_object.camera.get_pending_frame_or_null()
         if frame is not None:
             image_buffer_copy = np.copy(frame.image_buffer)
