@@ -23,7 +23,7 @@ class SLMContainer(object):
         self.objective_focal_length = self.config['objective_focal_length']
         
         self.slm_engine = pyhot.SLM(self.slm_display_shape[1], self.slm_display_shape[0],
-                                    self.slm_pixel_size, self.wavelength
+                                    self.slm_pixel_size, self.wavelength,
                                     self.objective_focal_length)
                                     
     def update_slm(self, evt):
