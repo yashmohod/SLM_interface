@@ -306,10 +306,10 @@ class SLMPanel(wx.Panel):
         
         self.v_sizer = wx.BoxSizer(wx.VERTICAL)
         self.parent = parent
-        self.scaling_ratio = 0.8
+        self.scaling_ratio = 8
 
         native_slm_size = wx.GetApp().slm_display.GetGeometry()[2:4]
-        self.aspect_ratio = native_slm_size[1]/native_slm_size[0]
+        self.aspect_ratio = native_slm_size[0]/native_slm_size[1]
         # eventually get rid of self.bitmap
         self.bitmap = self.scale_image_for_display(wx.Image(*native_slm_size)).ConvertToBitmap()
         self.curdis = wx.StaticBitmap(self, -1, self.bitmap)
