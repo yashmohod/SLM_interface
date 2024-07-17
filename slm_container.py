@@ -73,7 +73,7 @@ class SLMContainer(object):
             if pt != "":
                 if str(pt).count("(") == 1 and str(pt).count(")") == 1 and str(pt).count(",") == 2:
                     pt = str(pt).replace("(","").replace(")","").split(",")
-                    ptsarr.append([float(pt[0]),float(pt[1]),float(pt[2])])
+                    points_arr.append([float(pt[0]),float(pt[1]),float(pt[2])])
         return np.array(points_arr)
         
     
