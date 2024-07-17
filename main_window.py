@@ -188,7 +188,7 @@ class ControlPanel(wx.Panel):
         self.input_px = wx.TextCtrl(self, value=str(default_config['slm_pixel_size']), size=(100,-1))
         self.input_focal_len_label = wx.StaticText(self, label="Focal length")
         self.input_focal_len = wx.TextCtrl(self, value=str(default_config['objective_focal_length']), size=(100,-1))
-        self.input_wavlength_label = wx.StaticText(self, label="Wavelength")
+        self.input_wavelength_label = wx.StaticText(self, label="Wavelength")
         self.input_wavelength = wx.TextCtrl(self, value=str(default_config['wavelength']),size=(100,-1))
 
         self.multitrap_rb = wx.RadioBox(self, label = 'Multiple trap method',
