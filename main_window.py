@@ -4,8 +4,10 @@ main_window.py
 
 import wx
 import numpy as np 
-from PIL import Image
 from utility import gray_ndarray_to_wxImage
+from pubsub import pub
+
+# TODO: refactor scale_image_for_display
 
 class MainWindow(wx.Frame):
     def __init__(self, pos, size):
@@ -169,9 +171,6 @@ class ControlPanel(wx.Panel):
         self.onInint()
 
     
-    def updateDisplay(self,event):
-        pass
-    
     def onInint(self):
         # set Sizers
         h_sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -182,14 +181,15 @@ class ControlPanel(wx.Panel):
         h_sizer.Add(local_v_sizer_2,1,wx.EXPAND)
         h_sizer.Add(local_v_sizer_3,2,wx.EXPAND)  
     
+        default_config = wx.GetApp().slm_object.config
         
         self.unitsL = wx.StaticText(self, label = "Use any consistent length units.")
-        self.pxL = wx.StaticText(self, label="Pixel size")
-        self.pxVal = wx.TextCtrl(self, value="", size=(100,-1))
-        self.flocalLenL = wx.StaticText(self, label="Focal length")
-        self.flocalLenVal = wx.TextCtrl(self, value="", size=(100,-1))
-        self.WaveLenL = wx.StaticText(self, label="Wavelength")
-        self.WaveLenVal = wx.TextCtrl(self, value="",size=(100,-1))
+        self.input_px_label = wx.StaticText(self, label="SLM pixel size")
+        self.input_px = wx.TextCtrl(self, value=str(default_config['slm_pixel_size']), size=(100,-1))
+        self.input_focal_len_label = wx.StaticText(self, label="Focal length")
+        self.input_focal_len = wx.TextCtrl(self, value=str(default_config['objective_focal_length']), size=(100,-1))
+        self.input_wavlength_label = wx.StaticText(self, label="Wavelength")
+        self.input_wavelength = wx.TextCtrl(self, value=str(default_config['wavelength']),size=(100,-1))
 
         self.multitrap_rb = wx.RadioBox(self, label = 'Multiple trap method',
                                         choices = ['Simultaneous', 'Time-shared'])
@@ -214,13 +214,13 @@ class ControlPanel(wx.Panel):
         local_v_sizer_2.Add(self.points,0,wx.ALIGN_CENTRE)
     
         
-        updateDisplay = wx.Button(self,id = wx.ID_ANY, size= (200,40),label= "Update Display")
-        updateDisplay.Bind(wx.EVT_BUTTON,self.updateDisplay)
+        update_slm_button = wx.Button(self,id = wx.ID_ANY, size= (200,40),label= "Update SLM")
+        update_slm_button.Bind(wx.EVT_BUTTON, wx.GetApp().slm_object.update_slm)
         
         self.slmpanelL = wx.StaticText(self, label = "SLM Display")
         local_v_sizer_3.Add(self.slmpanelL,0,wx.ALIGN_CENTER)
         local_v_sizer_3.Add(self.slmpanel,0,wx.ALIGN_CENTER)
-        local_v_sizer_3.Add(updateDisplay,0,wx.ALIGN_CENTER)
+        local_v_sizer_3.Add(update_slm_button,0,wx.ALIGN_CENTER)
         self.SetSizer(h_sizer)        
     
     
@@ -306,21 +306,29 @@ class SLMPanel(wx.Panel):
         
         self.v_sizer = wx.BoxSizer(wx.VERTICAL)
         self.parent = parent
+        self.scaling_ratio = 0.8
 
-        img = np.zeros((1536,900,3))
-        img = wx.Bitmap.FromBuffer(1536, 900, img)
-        self.bitmap = scale_bitmap(wx.Bitmap(img),230)
-        self.curdis = wx.StaticBitmap(self, -1, self.bitmap)
+        native_slm_size = wx.GetApp().slm_display.GetGeometry()[2:4]
+        self.aspect_ratio = native_slm_size[1]/native_slm_size[0]
+        self.curdis = wx.StaticBitmap(self, -1, 
+                                      self.scale_image_for_display(wx.Image(*native_slm_size)).ConvertToBitmap())
         self.v_sizer.Add(self.curdis, 1, wx.ALIGN_CENTER)
         self.SetSizer(self.v_sizer)
 
         self.Bind(wx.EVT_SIZE, self.onResize)
         
-    
-    def updateSLMpanel(self,bitmapToSet):
+        pub.subscribe(self.update_panel, 'update_slm')
         
-        self.bitmap = scale_bitmap(bitmapToSet,self.parent.Size[1]*0.80)    
-        self.curdis.SetBitmap(self.bitmap)
+        
+    def scale_image_for_display(self, image):
+        return image.Scale(round(self.parent.Size[1] * self.scaling_ratio * self.aspect_ratio), 
+                           round(self.parent.Size[1] * self.scaling_ratio), wx.IMAGE_QUALITY_HIGH)
+        
+    
+    # TODO: update and bind to listener 
+    def update_panel(self, image):  
+        self.curdis.SetBitmap(self.scale_image_for_display(image).ConvertToBitmap())
+        
         
     def onResize(self,event):
         self.v_sizer.Clear()
