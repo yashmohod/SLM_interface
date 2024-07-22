@@ -28,7 +28,8 @@ class MainWindow(wx.Frame):
                           (self.camera_panel, 1, wx.EXPAND),
                           ((50,50)), #spacer, not used
                           (self.slm_control_panel, 1, wx.EXPAND),
-                          (self.slm_monitor_panel, 1, wx.EXPAND)])
+                          (self.slm_points_panel, 1, wx.EXPAND),
+                          (self.slm_monitor_panel, 1, wx.EXPAND),])
         self.SetSizer(self.fgs)
         
         self.InitUI()
