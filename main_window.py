@@ -4,7 +4,7 @@ main_window.py
 
 import wx
 import numpy as np 
-from gui_subpanels import CameraControlPanel, CameraPanel, SLMCntrolPanel, SLMPointsPanel, SLMMonitorPanel
+from gui_subpanels import CameraControlPanel, CameraPanel, SLMControlPanel, SLMPointsPanel, SLMMonitorPanel
 
 # TODO: refactor scale_image_for_display
 
