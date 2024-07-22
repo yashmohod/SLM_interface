@@ -27,10 +27,12 @@ class CameraControlPanel(wx.Panel):
         # TODO: use evt_update_ui to disable the button once pressed
         
     def on_start(self, evt):
-        pass 
+        camera_frame_time = self.parent.CameraPanel.live_frame_time_ms
+        self.parent.CameraPanel.live_cam_timer.Start(camera_frame_time)
+        
         
     def on_stop(self, evt):
-        pass 
+        self.parent.CameraPanel.live_cam_timer.Stop()
         
                 
 
@@ -66,7 +68,7 @@ class CameraPanel(wx.Panel):
         # currently triggers at 20 frames/sec (every 50 ms)
         # TODO: make rate settable
         self.live_frame_time_ms = 50
-        self.live_cam_timer.Start(self.live_frame_time_ms)
+        #self.live_cam_timer.Start(self.live_frame_time_ms)
         
     
     def scale_image_for_display(self, image):

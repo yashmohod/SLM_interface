@@ -1,6 +1,5 @@
 import wx
 import numpy as np
-from PIL import Image as im
 import os
 import glob
 import time
