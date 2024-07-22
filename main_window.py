@@ -38,23 +38,14 @@ class MainWindow(wx.Frame):
         self.main_hbox.Add(self.fgs, proportion = 1, flag = wx.ALL | wx.EXPAND, border = 0)
         self.SetSizer(self.main_hbox)
         
-        self.InitUI()
+        self.CreateMenuBar()
+        
         
         
     def OnClose(self, event):
         self.camera_object._cleanup()
         self.Destroy()
-        
-    def InitUI(self):
-        self.CreateMenuBar()
-        
-        #self.controlPanel = ControlPanel(parent=self)
-        #self.v_sizer.Add(self.controlPanel, 1, wx.EXPAND)
-        
-    
 
-        
-        
 
     def CreateMenuBar(self):
         menubar = wx.MenuBar()
@@ -65,14 +56,17 @@ class MainWindow(wx.Frame):
         saveSubMenu = wx.Menu()
         
         saveSubMenu.Append(201, 'Save sequence of images', 'Save sequence of images')
-        fileMenu.AppendSubMenu(saveSubMenu, 'Acquire')
+        #fileMenu.AppendSubMenu(saveSubMenu, 'Acquire')
     
-        menubar.Append(fileMenu,'&File')
+        
         
         settingsMenu = wx.Menu()
         exposureMenu = wx.Menu()
         exposureMenu.Append(101, 'Set Exposure Time', 'Set exposure time')
         settingsMenu.AppendSubMenu(exposureMenu, 'Exposure Time')
+        
+        menubar.Append(fileMenu,'&File')
+        menubar.Append(saveSubMenu, '&Acquire')
         menubar.Append(settingsMenu, '&Settings')
 
         self.Bind(wx.EVT_MENU, self.OnQuit, id=wx.ID_EXIT)
