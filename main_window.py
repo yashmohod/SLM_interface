@@ -176,10 +176,11 @@ class CameraControlPanel(wx.Panel):
                             flag = wx.ALL | wx.CENTER, border = 10)
         self.start_button = wx.Button(self, label = 'Start')
         self.stop_button = wx.Button(self, label = 'Stop')
-        self.main_sizer.Add(self.start_button, proportion = 0.3, flag = wx.ALL | wx.CENTER,
+        self.main_sizer.Add(self.start_button), proportion = 0.3, flag = wx.ALL | wx.CENTER,
                             border = 10)        
-        self.main_sizer.Add(self.stop_button, proportion = 0.3, flag = wx.ALL | wx.CENTER,
+        self.main_sizer.Add(self.stop_button), proportion = 0.3, flag = wx.ALL | wx.CENTER,
                             border = 10)    
+        self.SetSizer(self.main_sizer)
                             
         # event handlers
         self.Bind(wx.EVT_BUTTON, self.on_start, self.start_button)
