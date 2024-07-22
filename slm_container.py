@@ -31,7 +31,7 @@ class SLMContainer(object):
         Button in main window binds here.
         '''
         # get points from main window control panel
-        points = self._unpack_points_from_textctrl(wx.GetApp().main_frame.controlPanel.points.GetValue())
+        points = self._unpack_points_from_textctrl(wx.GetApp().main_frame.slm_points_panel.points.GetValue())
         
         self.update_slm_pts(points = points)
         
@@ -42,9 +42,9 @@ class SLMContainer(object):
         ''' 
         
         # check main slm_window
-        current_wavelength = float(wx.GetApp().main_frame.controlPanel.input_wavelength.GetValue())
-        current_pixel_size = float(wx.GetApp().main_frame.controlPanel.input_px.GetValue())
-        current_focal_length = float(wx.GetApp().main_frame.controlPanel.input_focal_len.GetValue())
+        current_wavelength = float(wx.GetApp().main_frame.slm_control_panel.input_wavelength.GetValue())
+        current_pixel_size = float(wx.GetApp().main_frame.slm_control_panel.input_px.GetValue())
+        current_focal_length = float(wx.GetApp().main_frame.slm_control_panel.input_focal_len.GetValue())
         
         if ((self.wavelength == current_wavelength) and (self.slm_pixel_size == current_pixel_size)
             and (self.objective_focal_length == current_focal_length)):
@@ -58,7 +58,7 @@ class SLMContainer(object):
                                     self.slm_pixel_size, self.wavelength,
                                     self.objective_focal_length)
         
-        if wx.GetApp().main_frame.controlPanel.multitrap_rb.GetSelection() == 0: # Simultaneous display
+        if wx.GetApp().main_frame.slm_control_panel.multitrap_rb.GetSelection() == 0: # Simultaneous display
             holo_img = gray_ndarray_to_wxImage(self.slm_engine.calc_holo(points))
             pub.sendMessage("update_slm", image = holo_img)
         else: # time shared

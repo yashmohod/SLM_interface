@@ -284,7 +284,7 @@ class SLMMonitorPanel(wx.Panel):
         self.curdis.SetBitmap(self.scale_image_for_display(image).ConvertToBitmap())
 
         
-
+'''
 class ControlPanel(wx.Panel):
     def __init__(self,parent):
         super().__init__(parent = parent )
@@ -344,7 +344,7 @@ class ControlPanel(wx.Panel):
         local_v_sizer_3.Add(self.slmpanel,0,wx.ALIGN_CENTER)
         local_v_sizer_3.Add(update_slm_button,0,wx.ALIGN_CENTER)
         self.SetSizer(h_sizer)        
-    
+'''    
     
 
 class CameraPanel(wx.Panel):
