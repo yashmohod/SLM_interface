@@ -28,12 +28,12 @@ class CameraControlPanel(wx.Panel):
         # TODO: use evt_update_ui to disable the button once pressed
         
     def on_start(self, evt):
-        camera_frame_time = self.parent.CameraPanel.live_frame_time_ms
-        self.parent.CameraPanel.live_cam_timer.Start(camera_frame_time)
+        camera_frame_time = self.parent.camera_panel.live_frame_time_ms
+        self.parent.camera_panel.live_cam_timer.Start(camera_frame_time)
         
         
     def on_stop(self, evt):
-        self.parent.CameraPanel.live_cam_timer.Stop()
+        self.parent.camera_panel.live_cam_timer.Stop()
         
                 
 
