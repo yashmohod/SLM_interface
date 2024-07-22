@@ -13,6 +13,7 @@ class MainWindow(wx.Frame):
     def __init__(self, pos, size):
         super().__init__(parent = None, title = "SLM and Camera Control", 
                          pos = pos, size = size)
+        self.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_MENU))
         self.camera_object = wx.GetApp().camera_object
         self.Bind(wx.EVT_CLOSE, self.OnClose)
         self.SetMinSize(size)
