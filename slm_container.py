@@ -25,8 +25,8 @@ class SLMContainer(object):
         self.slm_engine = pyhot.SLM(self.slm_display_shape[1], self.slm_display_shape[0],
                                     self.slm_pixel_size, self.wavelength,
                                     self.objective_focal_length)
-        self.slm_share_timer = wx.Timer(self, id = 2)
-        self.Bind(wx.EVT_TIMER, self.on_timer, id = 2)
+        self.slm_share_timer = wx.Timer()
+        self.slm_share_timer.Bind(wx.EVT_TIMER, self.on_timer)
         self.shared_holo_list = [] # for time sharing
                                     
     def update_slm(self, evt):
