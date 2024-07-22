@@ -10,6 +10,7 @@ from pubsub import pub
 class CameraControlPanel(wx.Panel):
     def __init__(self, parent):
         super().__init__(parent = parent)
+        self.parent = parent
         self.main_sizer = wx.BoxSizer(wx.VERTICAL)
         self.main_sizer.Add(wx.StaticText(self, label = 'Camera Live View:'),
                             flag = wx.ALL | wx.CENTER, border = 10)
