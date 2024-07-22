@@ -1,3 +1,12 @@
+'''
+gui_subpanels.py
+'''
+
+import wx
+import numpy as np
+from utility import gray_ndarray_to_wxImage
+from pubsub import pub
+
 class CameraControlPanel(wx.Panel):
     def __init__(self, parent):
         super().__init__(parent = parent)

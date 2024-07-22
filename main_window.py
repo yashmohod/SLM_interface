@@ -4,8 +4,6 @@ main_window.py
 
 import wx
 import numpy as np 
-from utility import gray_ndarray_to_wxImage
-from pubsub import pub
 from gui_subpanels import CameraControlPanel, CameraPanel, SLMCntrolPanel, SLMPointsPanel, SLMMonitorPanel
 
 # TODO: refactor scale_image_for_display
