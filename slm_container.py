@@ -25,6 +25,9 @@ class SLMContainer(object):
         self.slm_engine = pyhot.SLM(self.slm_display_shape[1], self.slm_display_shape[0],
                                     self.slm_pixel_size, self.wavelength,
                                     self.objective_focal_length)
+        self.slm_share_timer = wx.Timer(self, id = 2)
+        self.Bind(wx.EVT_TIMER, self.on_timer, id = 2)
+        self.shared_holo_list = [] # for time sharing
                                     
     def update_slm(self, evt):
         '''
@@ -58,12 +61,26 @@ class SLMContainer(object):
                                     self.slm_pixel_size, self.wavelength,
                                     self.objective_focal_length)
         
+        self.update_time_ms = int(wx.GetApp().main_frame.slm_control_panel.update_timeVal.GetValue())
+        
+        # stop any updates if happening
+            self.slm_share_timer.Stop()
+        
         if wx.GetApp().main_frame.slm_control_panel.multitrap_rb.GetSelection() == 0: # Simultaneous display
             holo_img = gray_ndarray_to_wxImage(self.slm_engine.calc_holo(points))
             pub.sendMessage("update_slm", image = holo_img)
         else: # time shared
-            raise NotImplementedError
+            self.shared_holo_list = [gray_ndarray_to_wxImage(self.slm_engine.calc_holo(np.array([point]))) for point in points]
+            self.shared_list_pointer = 0
+            self.slm_share_timer.Start(self.update_time_ms)
 
+    
+    def on_timer(self, evt):
+        pub.sendMessage("update_slm", image = self.shared_holo_list[self.shared_list_pointer])
+        if self.shared_list_pointer == len(self.shared_holo_list) - 1:
+            self.shared_list_pointer = 0
+        else:
+            self.shared_list_pointer = self.shared_list_pointer + 1
     
         
     def _unpack_points_from_textctrl(self, points):
