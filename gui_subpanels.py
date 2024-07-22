@@ -55,7 +55,7 @@ class CameraPanel(wx.Panel):
         
         self.v_sizer.Add(self.curdis, 1, wx.ALIGN_CENTER)
         self.SetSizer(self.v_sizer)
-        self.Bind(wx.EVT_SIZE, self.onResize)
+        #self.Bind(wx.EVT_SIZE, self.onResize)
         
         self.wasFullscreen = 0
         self.restoreSize = self.parent.Size[1]*0.50
@@ -73,7 +73,8 @@ class CameraPanel(wx.Panel):
         return image.Scale(round(self.camera_display_scale_factor * self.sensor_aspect_ratio * self.parent.Size[1]), 
                                  round(self.parent.Size[1] * self.camera_display_scale_factor), 
                                  wx.IMAGE_QUALITY_HIGH)
-        
+    
+    '''    
     def onResize(self, event):
         # if self.curdis.Size[1] !=round(self.parent.Size[1]*0.55):
         self.Refresh()
@@ -98,7 +99,7 @@ class CameraPanel(wx.Panel):
         self.v_sizer.Add(self.curdis, 1, wx.ALIGN_CENTER)
         self.Refresh()
         self.Layout()
-        
+    '''        
 
     def show_camera_snapshot(self, event):
         self.camera_object.camera.issue_software_trigger()
