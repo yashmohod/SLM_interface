@@ -41,7 +41,7 @@ class MainWindow(wx.Frame):
         
         
     def OnClose(self, event):
-        #self.camera_object._cleanup()
+        self.camera_object._cleanup()
         self.Destroy()
         
     def InitUI(self):
