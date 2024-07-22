@@ -26,7 +26,7 @@ class MainWindow(wx.Frame):
         #self.v_sizer.Add(self.cameraPanel, 1, wx.EXPAND)
         self.fgs.AddMany([(self.camera_control_panel, 1, wx.EXPAND),
                           (self.camera_panel, 1, wx.EXPAND),
-                          (50,50), #spacer, not used
+                          ((50,50)), #spacer, not used
                           (self.slm_control_panel, 1, wx.EXPAND),
                           (self.slm_monitor_panel, 1, wx.EXPAND)])
         self.SetSizer(self.fgs)
