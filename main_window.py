@@ -16,11 +16,20 @@ class MainWindow(wx.Frame):
         self.camera_object = wx.GetApp().camera_object
         self.Bind(wx.EVT_CLOSE, self.OnClose)
         self.SetMinSize(size)
-        self.v_sizer = wx.BoxSizer(wx.VERTICAL)
-        self.cameraPanel = CameraPanel(parent=self)
-        self.v_sizer.Add(self.cameraPanel, 1, wx.EXPAND)
-        self.SetSizer(self.v_sizer)
-
+        self.fgs = wx.FlexGridSizer(2, 3, 10, 10) # 2 rows, 3 cols
+        #self.v_sizer = wx.BoxSizer(wx.VERTICAL)
+        self.camera_control_panel = CameraControlPanel(parent = self)
+        self.camera_panel = CameraPanel(parent=self)
+        self.slm_control_panel = SLMControlPanel(parent = self)
+        self.slm_points_panel = SLMPointsPanel(parent = self)
+        self.slm_monitor_panel = SLMMonitorPanel(parent = self)
+        #self.v_sizer.Add(self.cameraPanel, 1, wx.EXPAND)
+        self.fgs.AddMany([(self.camera_control_panel, 1, wx.EXPAND),
+                          (self.camera_panel, 1, wx.EXPAND),
+                          (50,50), #spacer, not used
+                          (self.slm_control_panel, 1, wx.EXPAND),
+                          (self.slm_monitor_panel, 1, wx.EXPAND)])
+        self.SetSizer(self.fgs)
         
         self.InitUI()
         
@@ -32,8 +41,8 @@ class MainWindow(wx.Frame):
     def InitUI(self):
         self.CreateMenuBar()
         
-        self.controlPanel = ControlPanel(parent=self)
-        self.v_sizer.Add(self.controlPanel, 1, wx.EXPAND)
+        #self.controlPanel = ControlPanel(parent=self)
+        #self.v_sizer.Add(self.controlPanel, 1, wx.EXPAND)
         
     
 
@@ -152,6 +161,32 @@ class MainWindow(wx.Frame):
         exposure_dialog.Destroy()
     
 
+class CameraControlPanel(wx.Panel):
+    def __init__(self, parent):
+        super().__init__(parent = parent)
+        self.main_sizer = wx.BoxSizer(wx.VERTICAL)
+        self.main_sizer.Add(wx.StaticText(self, label = 'Camera Live View:'),
+                            wx.SizerFlags().CenterHorizontal())
+        self.start_button = wx.Button(self, label = 'Start')
+        self.stop_button = wx.Button(self, label = 'Stop')
+        self.main_sizer.Add(self.start_button, proportion = 0.3 flag = wx.ALL | wx.CENTER,
+                            border = 5)        
+        self.main_sizer.Add(self.stop_button, proportion = 0.3, flag = wx.ALL | wx.CENTER,
+                            border = 5)    
+                            
+        # event handlers
+        self.Bind(wx.EVT_BUTTON, self.on_start, self.start_button)
+        self.Bind(wx.EVT_BUTTON, self.on_stop, self.stop_button)
+        # TODO: use evt_update_ui to disable the button once pressed
+        
+    def on_start(self, evt):
+        pass 
+        
+    def on_stop(self, evt):
+        pass 
+        
+                
+
 
 def scale_bitmap(bitmap,ratio):
     # image = wx.ImageFromBitmap(bitmap)
@@ -162,6 +197,83 @@ def scale_bitmap(bitmap,ratio):
     result = wx.Bitmap(image)
     return result        
 
+
+class SLMControlPanel(wx.Panel):
+    def  __init__(self, parent):
+        super().__init__(parent = parent)
+        
+        # set Sizers
+        #h_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        local_v_sizer_1 = wx.BoxSizer(wx.VERTICAL)  
+    
+        default_config = wx.GetApp().slm_object.config
+        
+        self.unitsL = wx.StaticText(self, label = "Use any consistent length units.")
+        self.input_px_label = wx.StaticText(self, label="SLM pixel size")
+        self.input_px = wx.TextCtrl(self, value=str(default_config['slm_pixel_size']), size=(100,-1))
+        self.input_focal_len_label = wx.StaticText(self, label="Focal length")
+        self.input_focal_len = wx.TextCtrl(self, value=str(default_config['objective_focal_length']), size=(100,-1))
+        self.input_wavelength_label = wx.StaticText(self, label="Wavelength")
+        self.input_wavelength = wx.TextCtrl(self, value=str(default_config['wavelength']),size=(100,-1))
+
+        self.multitrap_rb = wx.RadioBox(self, label = 'Multiple trap method',
+                                        choices = ['Simultaneous', 'Time-shared'])
+        self.update_timeL = wx.StaticText(self, label = 'Time share period [ms]',pos = (20, 710))
+        self.update_timeVal = wx.TextCtrl(self, value = '50', size = (50, -1))
+        
+        local_v_sizer_1.Add(self.unitsL ,0,wx.ALIGN_CENTRE)
+        local_v_sizer_1.Add(self.input_px_label, 0, wx.ALIGN_CENTRE)
+        local_v_sizer_1.Add(self.input_px, 0, wx.ALIGN_CENTRE)
+        local_v_sizer_1.Add(self.input_focal_len_label, 0, wx.ALIGN_CENTRE)
+        local_v_sizer_1.Add(self.input_focal_len, 0, wx.ALIGN_CENTRE)
+        local_v_sizer_1.Add(self.input_wavelength_label, 0, wx.ALIGN_CENTRE)
+        local_v_sizer_1.Add(self.input_wavelength, 0, wx.ALIGN_CENTRE)
+        local_v_sizer_1.Add(self.multitrap_rb ,0,wx.ALIGN_CENTRE)
+        local_v_sizer_1.Add(self.update_timeL ,0,wx.ALIGN_CENTRE)
+        local_v_sizer_1.Add(self.update_timeVal ,0,wx.ALIGN_CENTRE)
+        
+        self.SetSizer(local_v_sizer_1) 
+    
+    
+class SLMPointsPanel(wx.Panel):
+    def __init__(self, parent):
+        super().__init__(parent = parent)
+        self.v_sizer = wx.BoxSizer(wx.VERTICAL)
+        self.v_sizer.Add(wx.StaticText(self, label = 'Trap Points:',
+                                       wx.SizerFlags().CenterHorizontal())
+        self.points = wx.TextCtrl(self, size = (200,250), style = wx.TE_MULTILINE)
+        self.v_sizer.Add(self.points,0,wx.ALIGN_CENTRE)
+        self.SetSizer(self.v_sizer)
+
+
+class SLMMonitorPanel(wx.Panel):
+    def __init__(self, parent):
+        super().__init__(parent = parent)
+        self.v_sizer = wx.BoxSizer(wx.VERTICAL)
+        self.parent = parent
+        self.scaling_ratio = 0.5
+        
+        # Scaling strategy: get size of parent frame and size relative to it
+                
+        native_slm_size = wx.GetApp().slm_display.GetGeometry()[2:4]
+        self.aspect_ratio = native_slm_size[0]/native_slm_size[1]
+        # eventually get rid of self.bitmap
+        self.curdis = wx.StaticBitmap(self, -1, 
+                                      self.scale_image_for_display(wx.Image(*native_slm_size)).ConvertToBitmap())
+        self.v_sizer.Add(self.curdis, 1, wx.ALIGN_CENTER)
+        self.SetSizer(self.v_sizer)
+                
+        pub.subscribe(self.update_panel, 'update_slm')
+                
+                
+    def scale_image_for_display(self, image):
+        return image.Scale(round(self.parent.Size[1] * self.scaling_ratio * self.aspect_ratio), 
+                           round(self.parent.Size[1] * self.scaling_ratio), wx.IMAGE_QUALITY_HIGH)
+                    
+    def update_panel(self, image):  
+        self.curdis.SetBitmap(self.scale_image_for_display(image).ConvertToBitmap())
+
+        
 
 class ControlPanel(wx.Panel):
     def __init__(self,parent):
@@ -308,6 +420,8 @@ class SLMPanel(wx.Panel):
         self.parent = parent
         self.scaling_ratio = 8
 
+        # Scaling strategy: get size of camera panel and size relative to it
+        
         native_slm_size = wx.GetApp().slm_display.GetGeometry()[2:4]
         self.aspect_ratio = native_slm_size[0]/native_slm_size[1]
         # eventually get rid of self.bitmap
