@@ -16,6 +16,9 @@ class MainWindow(wx.Frame):
         self.camera_object = wx.GetApp().camera_object
         self.Bind(wx.EVT_CLOSE, self.OnClose)
         self.SetMinSize(size)
+        self.main_panel = wx.Panel(self)
+        self.main_hbox = wx.BoxSizer(wx.HORIZONTAL)
+        
         self.fgs = wx.FlexGridSizer(2, 3, 0, 0) # 2 rows, 3 cols
         #self.v_sizer = wx.BoxSizer(wx.VERTICAL)
         self.camera_control_panel = CameraControlPanel(parent = self)
@@ -30,7 +33,9 @@ class MainWindow(wx.Frame):
                           (self.slm_control_panel, 1, wx.EXPAND),
                           (self.slm_points_panel, 1, wx.EXPAND),
                           (self.slm_monitor_panel, 1, wx.EXPAND),])
-        self.SetSizer(self.fgs)
+                          
+        self.main_hbox.Add(self.fgs, proportion = 1, flag = wx.ALL | wx.EXPAND, border = 0)
+        self.SetSizer(self.main_hbox)
         
         self.InitUI()
         
