@@ -4,7 +4,8 @@ main_window.py
 
 import wx
 import numpy as np 
-import PIL import Image as im
+from PIL import Image as im
+import os
 from gui_subpanels import CameraControlPanel, CameraPanel, SLMControlPanel, SLMPointsPanel, SLMMonitorPanel
 
 # TODO: refactor scale_image_for_display
