@@ -169,7 +169,7 @@ class CameraControlPanel(wx.Panel):
                             wx.SizerFlags().CenterHorizontal())
         self.start_button = wx.Button(self, label = 'Start')
         self.stop_button = wx.Button(self, label = 'Stop')
-        self.main_sizer.Add(self.start_button, proportion = 0.3 flag = wx.ALL | wx.CENTER,
+        self.main_sizer.Add(self.start_button, proportion = 0.3, flag = wx.ALL | wx.CENTER,
                             border = 5)        
         self.main_sizer.Add(self.stop_button, proportion = 0.3, flag = wx.ALL | wx.CENTER,
                             border = 5)    
@@ -239,7 +239,7 @@ class SLMPointsPanel(wx.Panel):
     def __init__(self, parent):
         super().__init__(parent = parent)
         self.v_sizer = wx.BoxSizer(wx.VERTICAL)
-        self.v_sizer.Add(wx.StaticText(self, label = 'Trap Points:',
+        self.v_sizer.Add(wx.StaticText(self, label = 'Trap Points:'),
                                        wx.SizerFlags().CenterHorizontal())
         self.points = wx.TextCtrl(self, size = (200,250), style = wx.TE_MULTILINE)
         self.v_sizer.Add(self.points,0,wx.ALIGN_CENTRE)
