@@ -16,7 +16,7 @@ class MainWindow(wx.Frame):
         self.camera_object = wx.GetApp().camera_object
         self.Bind(wx.EVT_CLOSE, self.OnClose)
         self.SetMinSize(size)
-        self.fgs = wx.FlexGridSizer(2, 3, 10, 10) # 2 rows, 3 cols
+        self.fgs = wx.FlexGridSizer(2, 3, 0, 0) # 2 rows, 3 cols
         #self.v_sizer = wx.BoxSizer(wx.VERTICAL)
         self.camera_control_panel = CameraControlPanel(parent = self)
         self.camera_panel = CameraPanel(parent=self)
@@ -244,6 +244,10 @@ class SLMPointsPanel(wx.Panel):
                                        wx.SizerFlags().CenterHorizontal())
         self.points = wx.TextCtrl(self, size = (200,250), style = wx.TE_MULTILINE)
         self.v_sizer.Add(self.points,0,wx.ALIGN_CENTRE)
+        self.v_sizer.Add(update_slm_button)
+        update_slm_button = wx.Button(self,id = wx.ID_ANY, size= (200,40),label= "Update SLM")
+        self.v_sizer.Add(update_slm_button, 0, wx.ALIGN_CENTRE)
+        update_slm_button.Bind(wx.EVT_BUTTON, wx.GetApp().slm_object.update_slm)
         self.SetSizer(self.v_sizer)
 
 
@@ -252,13 +256,12 @@ class SLMMonitorPanel(wx.Panel):
         super().__init__(parent = parent)
         self.v_sizer = wx.BoxSizer(wx.VERTICAL)
         self.parent = parent
-        self.scaling_ratio = 0.5
+        self.scaling_ratio = 0.3
         
         # Scaling strategy: get size of parent frame and size relative to it
                 
         native_slm_size = wx.GetApp().slm_display.GetGeometry()[2:4]
         self.aspect_ratio = native_slm_size[0]/native_slm_size[1]
-        # eventually get rid of self.bitmap
         self.curdis = wx.StaticBitmap(self, -1, 
                                       self.scale_image_for_display(wx.Image(*native_slm_size)).ConvertToBitmap())
         self.v_sizer.Add(self.curdis, 1, wx.ALIGN_CENTER)
@@ -342,7 +345,7 @@ class CameraPanel(wx.Panel):
     def __init__(self,parent):
         super().__init__(parent = parent)
         
-        self.v_sizer = wx.BoxSizer(wx.VERTICAL)
+        self.v_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.parent = parent
         
         self.camera_object = wx.GetApp().camera_object
