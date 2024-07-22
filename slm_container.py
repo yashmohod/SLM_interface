@@ -64,7 +64,7 @@ class SLMContainer(object):
         self.update_time_ms = int(wx.GetApp().main_frame.slm_control_panel.update_timeVal.GetValue())
         
         # stop any updates if happening
-            self.slm_share_timer.Stop()
+        self.slm_share_timer.Stop()
         
         if wx.GetApp().main_frame.slm_control_panel.multitrap_rb.GetSelection() == 0: # Simultaneous display
             holo_img = gray_ndarray_to_wxImage(self.slm_engine.calc_holo(points))
