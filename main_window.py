@@ -244,7 +244,6 @@ class SLMPointsPanel(wx.Panel):
                                        wx.SizerFlags().CenterHorizontal())
         self.points = wx.TextCtrl(self, size = (200,250), style = wx.TE_MULTILINE)
         self.v_sizer.Add(self.points,0,wx.ALIGN_CENTRE)
-        self.v_sizer.Add(update_slm_button)
         update_slm_button = wx.Button(self,id = wx.ID_ANY, size= (200,40),label= "Update SLM")
         self.v_sizer.Add(update_slm_button, 0, wx.ALIGN_CENTRE)
         update_slm_button.Bind(wx.EVT_BUTTON, wx.GetApp().slm_object.update_slm)
