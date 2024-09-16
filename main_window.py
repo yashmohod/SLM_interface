@@ -248,13 +248,16 @@ class MainWindow(wx.Frame):
               print(values)
               if len(values) == 4:
                  self.camera_object.camera.disarm()
+
                  lst_roi = list(self.camera_object.camera.roi)
                  lst_roi[0] = values[0]
                  lst_roi[1] = values[1]
                  lst_roi[2] = values[2]
                  lst_roi[3] = values[3]
+                 
                  self.camera_object.camera.roi = tuple(lst_roi)
                  self.camera_object.camera.arm(2)
+                 
               else:
                  pass
               
